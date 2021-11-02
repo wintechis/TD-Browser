@@ -1,0 +1,60 @@
+@use "sass:map";
+@use "../abstract/colors";
+#rightViewContainer {
+  .body-row-1 {
+    font-weight: 600;
+    font-size: x-large;
+    color: map.get(colors.$theme-colors, "secondary");
+  }
+  .body-row-2 {
+    overflow: auto;
+    display: flex;
+    flex-direction: column-reverse;
+  }
+  .card {
+    &-header,
+    &-footer {
+      cursor: pointer;
+    }
+    &-header {
+      text-align: left;
+    }
+    &-footer {
+      text-align: right;
+      font-size: small;
+      height: 20px;
+      padding: 2px;
+    }
+    width: 90%;
+    &-body {
+      text-align: left;
+      height: auto;
+    }
+    &-request {
+    }
+    &-response {
+      margin-left: auto;
+      .card-header,
+      .card-footer {
+        color: map.get(colors.$theme-colors, "white");
+        border: 1px solid map.get(colors.$theme-colors, "white");
+        background-color: green;
+      }
+      .card-footer {
+      }
+      &-failed {
+        .card-header,
+        .card-footer {
+          color: map.get(colors.$theme-colors, "white");
+          background-color: red;
+        }
+      }
+      &-notification {
+        .card-header,
+        .card-footer {
+          background-color: #df7900;
+        }
+      }
+    }
+  }
+}

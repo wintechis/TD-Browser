@@ -1,0 +1,17 @@
+@use "sass:map";
+@use "../abstract/colors";
+
+#settingsModal {
+  input[type="checkbox"] {
+  }
+  .form-check {
+    margin-left: 15px;
+    display: inline-block;
+    vertical-align: middle;
+  }
+  select {
+    margin-left: 15px;
+    width: 200px;
+    display: inline-block;
+  }
+}

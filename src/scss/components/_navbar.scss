@@ -1,0 +1,59 @@
+@use "sass:map";
+@use "../abstract/colors";
+#navbar {
+  background-color: map.get(colors.$theme-colors, "primary");
+  #consumingForm {
+    input[type="file"] {
+      display: none;
+    }
+    input {
+      width: 200px;
+      height: 30px;
+    }
+  }
+
+  .bi-gear {
+    color: white;
+    padding-top: 4px;
+    font-size: 25px;
+  }
+  button {
+    background-color: map.get(colors.$theme-colors, "secondary");
+    color: map.get(colors.$theme-colors, "white");
+    width: 78px;
+    font-size: 15px;
+    font-weight: 600;
+    height: 30px;
+    padding: 0;
+    vertical-align: baseline;
+  }
+  button:hover {
+    background-color: map.get(colors.$theme-colors, "white");
+    color: map.get(colors.$theme-colors, "secondary");
+    border: 2px solid map.get(colors.$theme-colors, "secondary");
+  }
+  #thingsAvatarContainer {
+    .thingAvatar {
+      width: 40px;
+      height: 40px;
+      text-align: center;
+      background-color: map.get(colors.$theme-colors, "white");
+      color: map.get(colors.$theme-colors, "secondary");
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 5px;
+      margin-top: 5px;
+      font-size: 18px;
+      cursor: pointer;
+      padding-top: 8px;
+      border: 2px solid map.get(colors.$theme-colors, "secondary");
+      cursor: pointer;
+    }
+    .currentThingAvatar,
+    .thingAvatar:hover {
+      color: map.get(colors.$theme-colors, "white");
+      background-color: map.get(colors.$theme-colors, "secondary");
+      border: 2px solid map.get(colors.$theme-colors, "white");
+    }
+  }
+}

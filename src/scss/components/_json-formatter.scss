@@ -1,0 +1,15 @@
+#middleViewContainer {
+  .JsonFormatter {
+    background-color: #f6f6f6;
+    padding: 10px;
+    padding-right: 20px;
+    margin-top: 15px;
+    margin: 20px;
+    overflow: auto;
+    font-size: large;
+    text-align: left;
+    .json-formatter-row {
+      margin-top: 10px;
+    }
+  }
+}

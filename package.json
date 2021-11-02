@@ -1,0 +1,41 @@
+{
+  "name": "td-form",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "npm run clean && parcel public/index.html --out-dir development -p 5501",
+    "build": "rimraf ./public && parcel build public/*.html --out-dir public --public-url ./",
+    "clean": "rimraf ./development && rimraf ./.cache"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OsamaHanoun/td-form.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/OsamaHanoun/td-form/issues"
+  },
+  "homepage": "https://github.com/OsamaHanoun/td-form#readme",
+  "dependencies": {
+    "@node-wot/binding-http": "^0.7.8",
+    "@node-wot/browser-bundle": "^0.7.8",
+    "@node-wot/core": "^0.7.8",
+    "axios": "^0.21.4",
+    "bootstrap": "^5.1.1",
+    "bootstrap-icons": "^1.5.0",
+    "img": "^3.0.3",
+    "jquery": "^3.6.0",
+    "json-formatter-js": "^2.3.4"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.15.5",
+    "@babel/plugin-transform-runtime": "^7.15.0",
+    "@babel/runtime-corejs2": "^7.15.4",
+    "parcel-bundler": "^1.12.5",
+    "sass": "^1.39.2"
+  }
+}

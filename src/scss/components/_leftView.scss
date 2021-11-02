@@ -1,0 +1,74 @@
+@use "sass:map";
+@use "../abstract/colors";
+
+#affordance {
+  overflow: auto;
+  .list-group {
+    height: calc(100vh - 250px);
+    text-align: left;
+  }
+  .list-group-item {
+    background-color: map.get(colors.$theme-colors, "primary");
+    color: map.get(colors.$theme-colors, "white");
+  }
+  .card {
+    .btn {
+      background-color: map.get(colors.$theme-colors, "primary");
+      color: map.get(colors.$theme-colors, "white");
+      &-active {
+        background-color: map.get(colors.$theme-colors, "white");
+        color: map.get(colors.$theme-colors, "primary");
+        border: 2px solid map.get(colors.$theme-colors, "primary");
+      }
+    }
+  }
+
+  .btn-active {
+    background-color: map.get(colors.$theme-colors, "white");
+    color: map.get(colors.$theme-colors, "primary");
+    border: 2px solid map.get(colors.$theme-colors, "primary");
+  }
+  .bi-bullseye {
+    position: absolute;
+    right: 0;
+    margin-right: 28px;
+  }
+}
+.leftView--editIcon {
+  position: absolute;
+  right: 0;
+  margin-right: 5px;
+}
+.leftView--observeIcon {
+  &--active {
+    background-color: green;
+    border-radius: 50%;
+    color: white;
+    text-align: center;
+    width: 24px;
+    display: inline-block;
+    height: 24px;
+    padding-bottom: 25px;
+  }
+}
+#affordanceButtons {
+  .btn {
+    background-color: map.get(colors.$theme-colors, "secondary");
+    display: inline-block;
+    color: map.get(colors.$theme-colors, "white");
+    // border-radius: 3px;
+    // margin-right: 3px;
+    height: 30px;
+    padding: 0;
+    &-active {
+      background-color: map.get(colors.$theme-colors, "white");
+      color: map.get(colors.$theme-colors, "secondary");
+      border: 2px solid map.get(colors.$theme-colors, "secondary");
+    }
+  }
+  .btn:hover {
+    background-color: map.get(colors.$theme-colors, "white");
+    color: map.get(colors.$theme-colors, "secondary");
+    border: 2px solid map.get(colors.$theme-colors, "secondary");
+  }
+}
