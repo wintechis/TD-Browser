@@ -1,0 +1,163 @@
+@use "sass:map";
+@use "../abstract/colors";
+#middleViewContainer {
+  #middleView-title {
+    font-weight: 600;
+    font-size: x-large;
+    color: map.get(colors.$theme-colors, "secondary");
+  }
+  #middleView-content {
+    display: grid;
+    grid-template-rows: max-content auto;
+    .card {
+      background-color: #edf1f6;
+      text-align: left;
+    }
+    .bi-bullseye,
+    .bi-pencil-fill,
+    .bi-info-circle-fill {
+      color: map.get(colors.$theme-colors, "primary");
+      cursor: pointer;
+    }
+    .bi-info-circle-fill {
+      color: map.get(colors.$theme-colors, "primary");
+    }
+    .bi-bullseye {
+      border-radius: 50%;
+      text-align: center;
+      width: 24px;
+      display: inline-block;
+      height: 24px;
+      padding-top: 3px;
+      padding-right: 1px;
+      margin-right: 2px;
+    }
+    // .bi-bullseye:hover {
+    //   background-color: green;
+    //   border-radius: 50%;
+    //   color: white;
+    //   text-align: center;
+    //   width: 24px;
+    //   display: inline-block;
+    //   height: 24px;
+    //   padding-top: 3px;
+    //   padding-right: 1px;
+    // }
+    .middleView--observeIcon--active {
+      background-color: green;
+      border-radius: 50%;
+      color: white;
+      text-align: center;
+      width: 24px;
+      display: inline-block;
+      height: 24px;
+      padding-top: 3px;
+      padding-right: 1px;
+    }
+    .middleView--observeIcon--active:hover {
+      background-color: map.get(colors.$theme-colors, "primary");
+    }
+
+    .middleView-affordanceTitleContainer {
+    }
+    form {
+      display: grid;
+      grid-template-rows: fit-content(90%) 60px;
+      text-align: left;
+      .middleView-inputsContainer {
+        border-radius: 15px;
+        padding: 10px;
+        height: 100%;
+        overflow: auto;
+      }
+      input,
+      select {
+        margin: 15px 0;
+        border: 2px solid map.get(colors.$theme-colors, "primary");
+      }
+      .btn-group {
+        margin: 15px 0;
+        text-align: center;
+        display: block;
+        .actionFormSelectButton {
+          background-color: map.get(colors.$theme-colors, "primary");
+          color: map.get(colors.$theme-colors, "white");
+          width: 15%;
+          &:hover {
+            background-color: map.get(colors.$theme-colors, "white");
+            color: map.get(colors.$theme-colors, "primary");
+            border: 1px solid map.get(colors.$theme-colors, "primary");
+          }
+          &-active {
+            background-color: map.get(colors.$theme-colors, "white");
+            color: map.get(colors.$theme-colors, "primary");
+            border: 1px solid map.get(colors.$theme-colors, "primary");
+          }
+        }
+        option:checked {
+          color: red;
+        }
+      }
+    }
+  }
+}
+#middleView--refreshIcon {
+  display: inline-block;
+  background-color: map.get(colors.$theme-colors, "primary");
+  border-radius: 50%;
+  margin-right: 2px;
+  cursor: pointer;
+  vertical-align: -1px;
+  color: map.get(colors.$theme-colors, "white");
+  padding: 0;
+  padding-top: 2px;
+  padding-right: 1px;
+  width: 17px;
+  height: 17px;
+  font-size: 14px;
+  border-bottom-width: 0px;
+  border-bottom-style: solid;
+}
+#middleView--backIcon {
+  position: absolute;
+  cursor: pointer;
+  color: map.get(colors.$theme-colors, "secondary");
+  font-size: 22px;
+  display: none;
+  // .middleView--backIcon-show {
+  //   display: inline;
+  // }
+}
+#middleView-propertyForm {
+  button[type="submit"] {
+    background-color: map.get(colors.$theme-colors, "secondary");
+    color: map.get(colors.$theme-colors, "white");
+    width: 80px;
+    height: 40px;
+    margin: auto;
+  }
+  input,
+  select {
+    border: 2px solid map.get(colors.$theme-colors, "primary");
+  }
+}
+#middleView-formSubmitButton {
+  margin: 20px auto 0 auto;
+  display: block;
+  color: map.get(colors.$theme-colors, "white");
+  background-color: map.get(colors.$theme-colors, "secondary");
+}
+#middleView--subscribeEvent,
+#middleView--unsubscribeEvent {
+  color: map.get(colors.$theme-colors, "white");
+  text-align: center;
+  margin: 60px auto;
+  width: 110px;
+  height: 40px;
+}
+#middleView--subscribeEvent {
+  background-color: green;
+}
+#middleView--unsubscribeEvent {
+  background-color: red;
+}

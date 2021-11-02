@@ -1,0 +1,17 @@
+@use "sass:map";
+@use "abstract/colors";
+@import "abstract/fonts";
+@import "components";
+@import "layout";
+@import "custom";
+@import "reset";
+@import "../../node_modules/bootstrap-icons/font/bootstrap-icons.css";
+// .btn-active {
+//   background-color: map.get(colors.$theme-colors, "white");
+//   color: map.get(colors.$theme-colors, "primary");
+//   border: 2px solid map.get(colors.$theme-colors, "primary");
+// }
+div {
+  scrollbar-width: thin;
+  scrollbar-color: map.get(colors.$theme-colors, "primary") #f3f3f3;
+}
