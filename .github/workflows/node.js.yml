@@ -34,13 +34,13 @@ jobs:
       run: |
             sudo apt-get install zip gzip tar
             mkdir TD-Browser
-            cp -a ./dist/. ./TD-Browser/
+            cp -a ./build/. ./TD-Browser/
             zip -r TD-Browser.zip TD-Browser
 
     - name: move to dir 
       run: |
             mkdir -p output
-            yes| cp -r dist ./output/
+            yes| cp -r build ./output/
             yes| cp -r TD-Browser.zip ./output/
 
     - name: Commit files
