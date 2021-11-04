@@ -34,8 +34,8 @@ jobs:
       run: |
             sudo apt-get install zip gzip tar
             mkdir TD-Browser
-            cp -a /dist/. /TD-Browser/
-            zip -r TD-Browser.zip ./TD-Browser
+            cp -a ./dist/. ./TD-Browser/
+            zip -r TD-Browser.zip TD-Browser
 
     - name: move to dir 
       run: |
@@ -48,7 +48,7 @@ jobs:
            git config user.name "GitHub Actions Bot"
            git config user.email "<>"
            git add ./output
-           git commit -m "new build"
+           git commit -m "rebuild"
           # git push origin master
     - name: Push changes 
       uses: ad-m/github-push-action@master
