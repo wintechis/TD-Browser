@@ -29,6 +29,6 @@ jobs:
     - run: npm i 
     - run: npm run build 
     - run: git add .
-    - run: git git commit -m "new build"
+    - run: git commit -m "new build"
     
 
