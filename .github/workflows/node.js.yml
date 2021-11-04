@@ -30,10 +30,16 @@ jobs:
       run: |
             npm i 
             npm run build 
+    - name: zip build folder
+      run: |
+            sudo apt-get install zip gzip tar
+            zip -r TD-Browser.zip dist
+
     - name: move to dir 
       run: |
             mkdir -p output
             yes| cp -r dist ./output/
+            yes| cp -r TD-Browser ./output/
 
     - name: Commit files
       run: |
