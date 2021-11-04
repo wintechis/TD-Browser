@@ -28,8 +28,7 @@ jobs:
         cache: 'npm'
     - run: npm i 
     - run: npm run build 
-    - name: Deploy
-      uses: peaceiris/actions-gh-pages@v3
-      with:
-            destination_dir: subdir
+    - run: git add .
+    - run: git git commit -m "new build"
+    
 
