@@ -39,7 +39,7 @@ jobs:
       run: |
            git config user.name "GitHub Actions Bot"
            git config user.email "<>"
-           git add ./dist
+           git add ./output
            git commit -m "new build"
           # git push origin master
     - name: Push changes 
