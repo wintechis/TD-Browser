@@ -30,7 +30,7 @@ jobs:
       run: |
             npm i 
             npm run build 
-    - name: move to dir # Move the generated files into output folder
+    - name: move to dir 
       run: |
           mkdir -p output
           yes| cp -r dist ./output/
@@ -40,7 +40,14 @@ jobs:
            git config user.email "<>"
            git add ./output
            git commit -m "new build"
-           git push origin master
+          # git push origin master
+    - name: Push changes 
+      uses: ad-m/github-push-action@master
+      with:
+          branch: B77 #ignore if your branch is master
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          force: true
+
 
     
 
