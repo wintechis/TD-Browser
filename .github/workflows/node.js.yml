@@ -39,7 +39,7 @@ jobs:
       run: |
             mkdir -p output
             yes| cp -r dist ./output/
-            yes| cp -r TD-Browser ./output/
+            yes| cp -r TD-Browser.zip ./output/
 
     - name: Commit files
       run: |
