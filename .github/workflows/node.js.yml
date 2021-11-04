@@ -28,7 +28,15 @@ jobs:
         cache: 'npm'
     - run: npm i 
     - run: npm run build 
-    - run: git add .
-    - run: git commit -m "new build"
+    - name: setup git config
+      run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "<>"
+    - name: commit
+      run: |
+           git add .
+           git commit -m "new build"
+           git push origin master
+
     
 
