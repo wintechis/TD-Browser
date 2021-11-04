@@ -33,7 +33,9 @@ jobs:
     - name: zip build folder
       run: |
             sudo apt-get install zip gzip tar
-            zip -r TD-Browser.zip ./dist
+            mkdir TD-Browser
+            cp -a /dist/. /TD-Browser/
+            zip -r TD-Browser.zip ./TD-Browser
 
     - name: move to dir 
       run: |
