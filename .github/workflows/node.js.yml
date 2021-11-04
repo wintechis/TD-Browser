@@ -26,15 +26,19 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-    - run: npm i 
-    - run: npm run build 
-    - name: setup git config
+    - name: build
       run: |
-          git config user.name "GitHub Actions Bot"
-          git config user.email "<>"
-    - name: commit
+            npm i 
+            npm run build 
+    - name: move to dir # Move the generated files into output folder
       run: |
-           git add ./dist
+          mkdir -p output
+          yes| cp -r dist ./output/
+    - name: Commit files
+      run: |
+           git config user.name "GitHub Actions Bot"
+           git config user.email "<>"
+           git add ./output
            git commit -m "new build"
            git push origin master
 
