@@ -34,6 +34,7 @@ jobs:
           git config user.email "<>"
     - name: commit
       run: |
+           cd dist
            git add .
            git commit -m "new build"
            git push origin master
