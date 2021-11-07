@@ -1,0 +1,27 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch Chrome",
+      "request": "launch",
+      "type": "pwa-chrome",
+      "url": "http://localhost:3001",
+      "webRoot": "${workspaceFolder}",
+      "breakOnLoad": true,
+      "sourceMapPathOverrides": {
+        "../*": "${webRoot}/*"
+      }
+    },
+    {
+      "type": "firefox",
+      "request": "launch",
+      "name": "Launch firefox against localhost",
+      "url": "http://localhost:3001",
+      "webRoot": "${workspaceFolder}",
+      "breakOnLoad": true,
+      "sourceMapPathOverrides": {
+        "../*": "${webRoot}/*"
+      }
+    }
+  ]
+}

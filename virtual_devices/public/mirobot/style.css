@@ -1,0 +1,45 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+#boxesContainer {
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  text-align: center;
+  width: 100%;
+}
+.box {
+  border: 5px solid black;
+  display: inline-block;
+  margin-right: 20px;
+  width: 140px;
+  height: 140px;
+  transition-duration: 5s;
+  transform: translateY(0);
+}
+#red {
+  background-color: red;
+}
+#blue {
+  background-color: blue;
+}
+#yellow {
+  background-color: yellow;
+}
+#green {
+  background-color: green;
+}
+.pick {
+  border: 5px solid rgb(103, 167, 103);
+  transition-duration: 4s;
+  transform: translateY(-200px);
+}
+.pick_without_duration {
+  border: 5px solid rgb(103, 167, 103);
+  transition-duration: 0s;
+  transform: translateY(-200px);
+}
