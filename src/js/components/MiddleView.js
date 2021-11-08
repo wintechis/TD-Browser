@@ -227,49 +227,49 @@ class MiddleView {
     required
   ) {
     let div = $.parseHTML(
-      `<div class=" btn-group " role="group" aria-label="Basic radio toggle button group"></div>`
+      `<div class="btn-group" role="group" aria-label="Basic radio toggle button group"></div>`
     );
     let select = $.parseHTML(
       `<select name="${title}" id="${
-        "-" + title
-      }-select" class="form-select" aria-label="Default select example" ${
+        "middleView-formField-" + title
+      }-select" class="form-select" aria-label="elect" ${
         required ? "required" : ""
       }></select> `
     );
     if (typeof enumArray !== "undefined") {
-      if (enumArray.length < 5) {
-        enumArray.forEach((val, idx) =>
-          $(div).append(
-            `<input type="radio" class="btn-check " name="${title}"  value="${val}"  id="${
-              title + idx
-            }" autocomplete="off" checked><label class="btn actionFormSelectButton" for="${
-              title + idx
-            }">${val}</label>`
-          )
-        );
-      } else {
-        enumArray.forEach((val) =>
-          $(select).append(`<option  value="${val}" >${val}</option>`)
-        );
-      }
+      // if (enumArray.length < 5) {
+      //   enumArray.forEach((val, idx) =>
+      //     $(div).append(
+      //       `<input type="radio" class="btn-check " name="${title}"  value="${val}"  id="${
+      //         title + idx
+      //       }" autocomplete="off" checked><label class="btn actionFormSelectButton" for="${
+      //         title + idx
+      //       }">${val}</label>`
+      //     )
+      //   );
+      // } else {
+      enumArray.forEach((val) =>
+        $(select).append(`<option  value="${val}" >${val}</option>`)
+      );
+      // }
+
       $(formElement).append(
         `<div class=""> 
         ${collapseSpanElement(title, title)}        
         
         ${descriptionString(title, description)}`,
-        enumArray.length < 5 ? div : select,
+        // enumArray.length < 5 ? div : select,
+        select,
         "</div>"
       );
     } else if (type === "string") {
       $(formElement).append(
-        $.parseHTML(
-          `<div>
+        `<div>
           ${collapseSpanElement(title, title)}        
           ${descriptionString(title, description)}
           <input name="${title}" type="text" class="form-control" id="middleView-formField-${title}" ${
-            required ? "required" : ""
-          }></div>`
-        )
+          required ? "required" : ""
+        }></div>`
       );
     } else if (type === "integer") {
       $(formElement).append(
@@ -309,12 +309,22 @@ class MiddleView {
     this.resetMiddleView();
     let actionObj = this.#tc.getActionForm(actionName);
     let uriVariables = actionObj.uriVariables;
+    let properties =
+      actionObj.input !== undefined ? actionObj.input.properties : undefined;
+    let types;
+    if (uriVariables) {
+      types = Object.keys(uriVariables).reduce((accumulator, key) => {
+        return { ...accumulator, [key]: uriVariables[key].type };
+      }, {});
+    } else if (properties) {
+      types = Object.keys(properties).reduce((accumulator, key) => {
+        return { ...accumulator, [key]: properties[key].type };
+      }, {});
+    } else {
+      types = undefined;
+    }
     this.#currentAction = {
-      types:
-        uriVariables &&
-        Object.keys(uriVariables).reduce((accumulator, key) => {
-          return { ...accumulator, [key]: uriVariables[key].type };
-        }, {}),
+      types,
       actionName,
       hasUriVariables: typeof uriVariables === "object" ? true : false,
     };
