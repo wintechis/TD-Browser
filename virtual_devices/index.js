@@ -10,10 +10,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 app.use("/static", express.static("public"));
-// app.use("static/bulb", express.static("public/bulb"));
+app.use("static/bulb", express.static("public/bulb"));
 const mirobot = require("./src/mirobot")(io);
-// const bulb = require("./src/bulb")(io, longpoll);
-// app.use(bulb);
+const bulb = require("./src/bulb")(io);
+app.use(bulb);
 app.use(mirobot);
 
 // ---------------------------------------- //

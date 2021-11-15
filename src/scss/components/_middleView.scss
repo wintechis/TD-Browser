@@ -61,8 +61,7 @@
     .middleView-affordanceTitleContainer {
     }
     form {
-      display: grid;
-      grid-template-rows: fit-content(90%) 60px;
+      height: calc(100vh - 305px);
       text-align: left;
       .middleView-inputsContainer {
         border-radius: 15px;

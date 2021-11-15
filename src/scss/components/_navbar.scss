@@ -37,23 +37,37 @@
       width: 40px;
       height: 40px;
       text-align: center;
-      background-color: map.get(colors.$theme-colors, "white");
-      color: map.get(colors.$theme-colors, "secondary");
       border-radius: 50%;
       display: inline-block;
       margin-right: 5px;
       margin-top: 5px;
       font-size: 18px;
+      font-weight: 600;
       cursor: pointer;
       padding-top: 8px;
-      border: 2px solid map.get(colors.$theme-colors, "secondary");
+      color: map.get(colors.$theme-colors, "white");
+      background-color: map.get(colors.$theme-colors, "secondary");
+      border: 2px solid map.get(colors.$theme-colors, "white");
       cursor: pointer;
     }
     .currentThingAvatar,
     .thingAvatar:hover {
-      color: map.get(colors.$theme-colors, "white");
-      background-color: map.get(colors.$theme-colors, "secondary");
-      border: 2px solid map.get(colors.$theme-colors, "white");
+      background-color: map.get(colors.$theme-colors, "white");
+      color: map.get(colors.$theme-colors, "secondary");
+      border: 2px solid map.get(colors.$theme-colors, "secondary");
+    }
+  }
+  #settingsIcon {
+    margin-top: 5px;
+    cursor: pointer;
+    &:hover::before {
+      background-color: map.get(colors.$theme-colors, "white");
+      color: map.get(colors.$theme-colors, "secondary");
+      border: 2px solid map.get(colors.$theme-colors, "secondary");
+      border-radius: 15px;
+    }
+    &::before {
+      padding: 2px;
     }
   }
 }
