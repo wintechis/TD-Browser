@@ -1,6 +1,5 @@
 const socket = io("/client/mirobot");
 socket.on("status", (payload) => {
-  console.log(payload);
   payload.holding_box &&
     document
       .getElementById(payload.current_box)
