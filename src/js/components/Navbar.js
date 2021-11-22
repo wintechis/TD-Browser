@@ -68,7 +68,6 @@ class Navbar {
       .on("change", () => {
         let file = $("#fileInput").prop("files");
         try {
-          console.log(file[0].type);
           if (
             file[0].type !== "application/json" &&
             file[0].type !== "application/ld+json"
@@ -124,6 +123,7 @@ class Navbar {
       $("#logoDiv").hide();
       $("#bodyDiv").show();
       this.#LV.appendMetadata();
+      this.#LV.highlightButton("affordanceMetadata");
       this.#MV.clearMiddleViewContent();
       this.#MV.addMiddleViewTitle(this.#tc.currentThingTitle);
     }
@@ -133,7 +133,7 @@ class Navbar {
     title = title.split(" ");
     let avatarText = "";
     if (title.length > 1) {
-      avatarText = (title[0] + title[title.indexOf(" ") + 1]).toUpperCase();
+      avatarText = (title[0][0] + title[1][0]).toUpperCase();
     } else if (title.length === 1) {
       avatarText = (title[0][0] + title[0][1]).toUpperCase();
     }
@@ -152,6 +152,7 @@ class Navbar {
     let currentID = id.split("--")[1];
     this.#tc.setCurrentThingByID(currentID);
     this.#LV.appendMetadata();
+    this.#LV.highlightButton("affordanceMetadata");
     this.#MV.addMiddleViewTitle(this.#tc.currentThingTitle);
     this.#MV.clearMiddleViewContent();
   }
