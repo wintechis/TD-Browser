@@ -134,26 +134,48 @@ class MiddleView {
 
   async #submitAction(e) {
     let payload = [this.#currentAction.actionName];
-    let inputs = $("#middleView-actionForm")
-      .serializeArray()
-      .filter((input) => input.value.length !== 0)
-      .map((input) => {
-        if (this.#currentAction.types[input.name] === "integer") {
-          return { name: input.name, value: Number(input.value) };
-        } else if (this.#currentAction.types[input.name] === "boolean") {
-          return { name: input.name, value: input.value === "true" };
-        }
-        return input;
-      });
+    let inputs = $("#middleView-actionForm").serializeArray();
+    if (inputs.length > 1) {
+      inputs = inputs
+        .filter((input) => input.value.length !== 0)
+        .map((input) => {
+          if (
+            this.#currentAction.types[input.name] === "integer" ||
+            this.#currentAction.types[input.name] === "number"
+          ) {
+            return { name: input.name, value: Number(input.value) };
+          } else if (this.#currentAction.types[input.name] === "boolean") {
+            return { name: input.name, value: input.value === "true" };
+          }
+          return input;
+        });
+    } else {
+      if (
+        this.#currentAction.types[inputs[0].name] === "integer" ||
+        this.#currentAction.types[inputs[0].name] === "number"
+      ) {
+        inputs = [{ name: undefined, value: Number(inputs[0].value) }];
+      } else if (this.#currentAction.types.undefined === "boolean") {
+        inputs = [{ name: undefined, value: inputs[0].value === "true" }];
+      } else {
+        inputs = [{ name: undefined, value: inputs[0].value }];
+      }
+    }
     let inputsObject = inputs.reduce((accumulator, current) => {
       accumulator[current.name] = current.value;
       return { ...accumulator };
     }, {});
     if (this.#currentAction.hasUriVariables) {
       payload.push(undefined, { uriVariables: { ...inputsObject } });
+    } else if (
+      Object.keys(inputsObject).length === 1 &&
+      inputsObject.hasOwnProperty("undefined")
+    ) {
+      payload[1] = inputsObject.undefined;
     } else {
       payload.push(inputsObject);
     }
+
     let response = await this.#tc.invokeAction(payload);
     let formatter = $.parseHTML(`<div class="JsonFormatter"></div>`);
     $(formatter).append(new JSONFormatter(response, 1).render());
@@ -191,7 +213,10 @@ class MiddleView {
         );
         $(inputsContainer).append(formFields);
       });
-    } else if (actionObj.hasOwnProperty("input")) {
+    } else if (
+      actionObj.hasOwnProperty("input") &&
+      actionObj.input.hasOwnProperty("properties")
+    ) {
       let propertiesObject = {
         ...actionObj.input.properties,
       };
@@ -209,6 +234,30 @@ class MiddleView {
         );
         $(inputsContainer).append(formFields);
       });
+    } else if (
+      (actionObj.hasOwnProperty("input") &&
+        !actionObj.input.hasOwnProperty("properties")) ||
+      !actionObj.hasOwnProperty("input")
+    ) {
+      let formField = this.#generateFormFields(
+        inputsContainer,
+        actionObj.hasOwnProperty("input")
+          ? actionObj.input.type
+          : actionObj.type,
+        undefined,
+        undefined,
+        actionObj.hasOwnProperty("input")
+          ? actionObj.input.enum
+          : actionObj.enum,
+        actionObj.hasOwnProperty("input")
+          ? actionObj.input.minimum
+          : actionObj.minimum,
+        actionObj.hasOwnProperty("input")
+          ? actionObj.input.maximum
+          : actionObj.maximum,
+        true
+      );
+      $(inputsContainer).append(formField);
     }
     $(formElement).append(
       inputsContainer,
@@ -255,18 +304,18 @@ class MiddleView {
 
       $(formElement).append(
         `<div class=""> 
-        ${collapseSpanElement(title, title)}        
-        
-        ${descriptionString(title, description)}`,
-        // enumArray.length < 5 ? div : select,
-        select,
+        ${title !== undefined ? collapseSpanElement(title, title) : ""}        
+        ${title !== undefined ? descriptionString(title, description) : ""}`,
+        select, // enumArray.length < 5 ? div : select,
         "</div>"
       );
     } else if (type === "string") {
       $(formElement).append(
         `<div>
-          ${collapseSpanElement(title, title)}        
-          ${descriptionString(title, description)}
+          ${
+            title !== undefined ? collapseSpanElement(title, title) : ""
+          }        
+          ${title !== undefined ? descriptionString(title, description) : ""}
           <input name="${title}" type="text" class="form-control" id="middleView-formField-${title}" ${
           required ? "required" : ""
         }></div>`
@@ -274,9 +323,23 @@ class MiddleView {
     } else if (type === "integer") {
       $(formElement).append(
         $.parseHTML(
-          `<div class="">${collapseSpanElement(title, title)}   
-            ${descriptionString(title, description)}
-            <input type="number" class="form-control " id="middleView-formField-${title}" min="${
+          `<div class="">${
+            title !== undefined ? collapseSpanElement(title, title) : ""
+          }   
+            ${title !== undefined ? descriptionString(title, description) : ""}
+            <input type="number" class="form-control" step="1"  id="middleView-formField-${title}" min="${
+            min ? min : ""
+          }" max="${max ? max : ""}" ${required ? "required" : ""}></div>`
+        )
+      );
+    } else if (type === "number") {
+      $(formElement).append(
+        $.parseHTML(
+          `<div class="">${
+            title !== undefined ? collapseSpanElement(title, title) : ""
+          }   
+            ${title !== undefined ? descriptionString(title, description) : ""}
+            <input type="number" step="any" class="form-control " id="middleView-formField-${title}" min="${
             min ? min : ""
           }" max="${max ? max : ""}" ${required ? "required" : ""}></div>`
         )
@@ -285,11 +348,10 @@ class MiddleView {
       $(formElement).append(
         $.parseHTML(
           `<div class=""> <div class="form-check form-switch"> 
-              ${collapseSpanElement(title, title)}   
-              ${descriptionString(
-                "middleView$$description$$" + title,
-                description
-              )}
+              ${title !== undefined ? collapseSpanElement(title, title) : ""}   
+              ${
+                title !== undefined ? descriptionString(title, description) : ""
+              }
               <input name="${title}"  id="middleView-formField-${title}" class="form-check-input " value="true"  type="checkbox" checked>
             </div>`
         )
@@ -320,6 +382,16 @@ class MiddleView {
       types = Object.keys(properties).reduce((accumulator, key) => {
         return { ...accumulator, [key]: properties[key].type };
       }, {});
+    } else if (
+      (actionObj.hasOwnProperty("input") &&
+        actionObj.input.hasOwnProperty("type")) ||
+      (!actionObj.hasOwnProperty("input") && actionObj.hasOwnProperty("type"))
+    ) {
+      types = {
+        undefined: actionObj.hasOwnProperty("input")
+          ? actionObj.input.type
+          : actionObj.type,
+      };
     } else {
       types = undefined;
     }
