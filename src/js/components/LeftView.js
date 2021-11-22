@@ -41,38 +41,38 @@ class LeftView {
       switch (elementID.includes("--") ? elementID.split("--")[0] : elementID) {
         case "affordanceMetadata":
           this.appendMetadata();
-          this.#highlightButton(elementID);
+          this.highlightButton(elementID);
           this.#mv.resetMiddleView();
           break;
         case "affordanceAction":
           this.#appendActions();
-          this.#highlightButton(elementID);
+          this.highlightButton(elementID);
           this.#mv.resetMiddleView();
           break;
         case "affordanceEvent":
           this.#appendEvents();
-          this.#highlightButton(elementID);
+          this.highlightButton(elementID);
           this.#mv.resetMiddleView();
           break;
         case "affordanceProperty":
           this.#appendProperties();
-          this.#highlightButton(elementID);
+          this.highlightButton(elementID);
           this.#mv.resetMiddleView();
           break;
         case "affordanceKey":
-          this.#highlightButton(elementID);
+          this.highlightButton(elementID);
           this.#mv.appendCredentialForm();
           break;
         case "action":
-          this.#highlightButton(elementID);
+          this.highlightButton(elementID);
           this.#mv.appendActionForm(elementID.split("--")[1]);
           break;
         case "property":
-          this.#highlightButton(elementID);
+          this.highlightButton(elementID);
           this.#mv.appendPropertyResponse(elementID.split("--").splice(1, 2));
           break;
         case "event":
-          this.#highlightButton(elementID);
+          this.highlightButton(elementID);
           this.#mv.appendEvent(elementID.split("--")[1]);
           break;
         case "observeIcon":
@@ -86,7 +86,7 @@ class LeftView {
       }
     });
   }
-  #highlightButton(id) {
+  highlightButton(id) {
     if (id.includes("--")) {
       $(`#${this.#previousSelectedButton.itemButton}`).removeClass(
         "btn-active"
@@ -120,7 +120,6 @@ class LeftView {
     $("#affordance").append(listGroupElement);
   }
   toggleObserveIcon(property) {
-    console.log(property);
     $(`#observeIcon--${property}`).hasClass("leftView--observeIcon--active")
       ? $(`#observeIcon--${property}`).removeClass(
           "leftView--observeIcon--active"
