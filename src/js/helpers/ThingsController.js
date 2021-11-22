@@ -56,6 +56,9 @@ class ThingsController {
   }
 
   async consume(td) {
+    if (!td.hasOwnProperty("id") || td.id.length === 0) {
+      td.id = Date.now();
+    }
     let servient = new Wot.Core.Servient();
     servient.addClientFactory(new Wot.Http.HttpsClientFactory(null));
     servient.addClientFactory(new Wot.Http.HttpClientFactory(null));
