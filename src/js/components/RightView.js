@@ -43,6 +43,7 @@ class RightView {
   #onSubmit() {}
   appendRequestToView(title, request) {
     const formattedTime = this.#formatTime(request.date);
+    console.log(request);
     let formattedData;
     if (
       [
@@ -52,20 +53,19 @@ class RightView {
         "subscribeEvent",
       ].includes(request.type)
     ) {
-      formattedData = " ";
+      formattedData = undefined;
     } else if (request.type === "writeProperty") {
       formattedData = new JSONFormatter(request.data[2]).render();
     } else if (request.type === "invokeAction") {
-      formattedData = request.data[2]
+      formattedData = request.data[1]
         ? new JSONFormatter(request.data[1]).render()
-        : "";
+        : undefined;
     } else {
       formattedData = new JSONFormatter(request.data).render();
     }
     const card = $.parseHTML(
       `<div class="card card-request text-center mb-3"> </div>`
     );
-
     const cardHeader = () => {
       let headerText;
       if (request.type === "invokeAction") {
@@ -78,7 +78,17 @@ class RightView {
         headerText = request.data.join(" : ");
       }
       return $.parseHTML(
-        `<div class="card-header " data-bs-toggle="collapse" data-bs-target="#request-${request.date}"aria-expanded="false" aria-controls="request-${request.date}">${title} <span class="bi-caret-right-fill"/> <span class="badge bg-secondary">${request.type}</span> <span class="bi-caret-right-fill"/> ${headerText}</div>`
+        `<div class="card-header ${
+          formattedData ? "" : "card-header-pointer-none"
+        }" ${
+          formattedData === undefined ? "" : `data-bs-toggle="collapse"`
+        } data-bs-target="#request-${
+          request.date
+        }"aria-expanded="false" aria-controls="request-${
+          request.date
+        }">${title} <span class="bi-caret-right-fill"/> <span class="badge bg-secondary">${
+          request.type
+        }</span> <span class="bi-caret-right-fill"/> ${headerText}</div>`
       );
     };
     const cardBody = $.parseHTML(
@@ -86,7 +96,15 @@ class RightView {
     );
     $(cardBody).append(formattedData);
     const cardFooter = $.parseHTML(
-      `<div class="card-footer" data-bs-toggle="collapse" data-bs-target="#request-${request.date}" aria-expanded="false" aria-controls="request-${request.date}">${formattedTime}</div>`
+      `<div class="card-footer ${
+        formattedData ? "" : "card-header-pointer-none"
+      }" ${
+        formattedData === undefined ? "" : `data-bs-toggle="collapse"`
+      } data-bs-target="#request-${
+        request.date
+      }" aria-expanded="false" aria-controls="request-${
+        request.date
+      }">${formattedTime}</div>`
     );
     $(card).append(cardHeader(), cardBody, cardFooter);
     $("#rightViewContainer > .body-row-2").prepend(card);
@@ -96,7 +114,7 @@ class RightView {
     const formattedTime = this.#formatTime(response.date);
     const formattedData =
       response.data[0] === undefined
-        ? ""
+        ? undefined
         : new JSONFormatter(response.data[0]).render();
     const card = $.parseHTML(
       `<div class=" ${
@@ -119,8 +137,16 @@ class RightView {
         headerText = request.data.join(" : ");
       }
       return $.parseHTML(
-        `<div class="card-header" data-bs-toggle="collapse" data-bs-target="#response-${response.date}" aria-expanded="false" aria-controls="response-${response.date}">
-        ${title} <span class="bi-caret-right-fill"/> <span class="badge bg-secondary">${request.type}</span>
+        `<div class="card-header ${
+          formattedData ? "" : "card-header-pointer-none"
+        }" ${
+          formattedData === undefined ? "" : `data-bs-toggle="collapse"`
+        } data-bs-target="#response-${
+          response.date
+        }" aria-expanded="false" aria-controls="response-${response.date}">
+        ${title} <span class="bi-caret-right-fill"/> <span class="badge bg-secondary">${
+          request.type
+        }</span>
            <span class="bi-caret-right-fill"/> ${headerText}
         </div>`
       );
@@ -130,7 +156,15 @@ class RightView {
     );
     $(cardBody).append(formattedData);
     const cardFooter = $.parseHTML(
-      `<div class="card-footer" data-bs-toggle="collapse" data-bs-target="#response-${response.date}" aria-expanded="false" aria-controls="response-${response.date}">${formattedTime}</div>`
+      `<div class="card-footer ${
+        formattedData ? "" : "card-header-pointer-none"
+      }" ${
+        formattedData === undefined ? "" : `data-bs-toggle="collapse"`
+      } data-bs-target="#response-${
+        response.date
+      }" aria-expanded="false" aria-controls="response-${
+        response.date
+      }">${formattedTime}</div>`
     );
     $(card).append(cardHeader(), cardBody, cardFooter);
     $("#rightViewContainer > .body-row-2").prepend(card);

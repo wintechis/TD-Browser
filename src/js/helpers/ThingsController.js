@@ -300,10 +300,14 @@ class ThingsController {
     if (!this.hasCurrentThing) return null;
     const thingId = this.currentThingID;
     const requestDate = Date.now().toString();
+    console.log("***********************" + payload.length);
     const data =
       payload.length > 2
         ? [payload[0], { ...payload[2].uriVariables }]
-        : [payload[0], { ...payload[1] }];
+        : [
+            payload[0],
+            typeof payload[1] === "object" ? { ...payload[1] } : payload[1],
+          ];
     this.#logger.saveRequest("invokeAction", data, thingId, requestDate);
     return await this.#currentThing
       .invokeAction(...payload)
@@ -334,7 +338,7 @@ class ThingsController {
         const responseDate = Date.now().toString();
         this.#logger.saveResponse(
           "invokeAction",
-          [res],
+          [],
           thingId,
           requestDate,
           responseDate,
