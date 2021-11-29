@@ -84,7 +84,9 @@ module.exports = (io) => {
       `/mirobot/properties/holding_box/observeproperty`,
       property.holding_box
     );
-    longpoll.publish(`/mirobot/events/${box}_box`, `${box} box was picked`);
+
+    box !== "none" &&
+      longpoll.publish(`/mirobot/events/${box}_box`, `${box} box was picked`);
   });
   return Router;
 };
