@@ -13,19 +13,26 @@
   }
   .card {
     border: none;
-    &-header,
-    &-footer {
-      cursor: pointer;
-      border: none;
-    }
     &-header {
       text-align: left;
+      border: none;
+      border-bottom: 2px solid map.get(colors.$theme-colors, "bg-secondary");
+      font-size: 0.9rem;
     }
     &-footer {
+      border: none;
       text-align: right;
       font-size: small;
       height: 20px;
       padding: 2px;
+    }
+    &-header,
+    &-footer {
+      cursor: pointer;
+      &-pointer-none {
+        cursor: default;
+        border: none;
+      }
     }
     width: 90%;
     &-body {
