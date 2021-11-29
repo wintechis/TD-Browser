@@ -64,7 +64,13 @@ class Settings {
     this.applySettings();
   }
   applySettings() {
-    let settings = JSON.parse(localStorage.getItem("settings"));
+    let defaultSettings = {
+      notificationSound: true,
+      logs: "onlyNotifications",
+      theme: "default",
+    };
+    let settings =
+      JSON.parse(localStorage.getItem("settings")) || defaultSettings;
     let selectedElements =
       ".card-request, .card-response-invokeAction, .card-response-readProperty, .card-response-writeProperty";
     if (settings.logs === "onlyNotifications") {
