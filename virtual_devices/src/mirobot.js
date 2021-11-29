@@ -55,12 +55,10 @@ module.exports = (io) => {
     );
     property.current_box = "none";
   });
-  Router.post("/mirobot/actions/pick_box", (req, res) => {
+  Router.post("/mirobot/actions/pick_box", express.text(), (req, res) => {
     const boxesEnum = ["red", "green", "blue", "yellow"];
     const boxIndex =
-      typeof req.body.color === "string"
-        ? boxesEnum.indexOf(req.body.color)
-        : -1;
+      typeof req.body === "string" ? boxesEnum.indexOf(req.body) : -1;
     if (boxIndex === -1) {
       res
         .status(400)
@@ -77,7 +75,7 @@ module.exports = (io) => {
         })
         .end();
     }
-    const box = req.body.color;
+    const box = req.body;
     property.holding_box = true;
     property.current_box = box;
     mirobotSocket.emit("pick_box", box);
