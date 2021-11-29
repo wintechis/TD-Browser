@@ -1,5 +1,9 @@
 $theme-colors: (
-  "primary": #043762,
-  "secondary": #901526,
-  "white": #ffffff,
+  "primary": var(--color-primary),
+  "secondary": var(--color-secondary),
+  "tertiary": var(--color-tertiary),
+  "font-primary": var(--color-primary--font),
+  "font-secondary": var(--color-secondary--font),
+  "bg-primary": var(--color-primary--bg),
+  "bg-secondary": var(--color-secondary--bg),
 );

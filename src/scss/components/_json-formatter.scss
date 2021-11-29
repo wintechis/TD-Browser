@@ -1,6 +1,8 @@
+@use "sass:map";
+@use "../abstract/colors";
 #middleViewContainer {
   .JsonFormatter {
-    background-color: #f6f6f6;
+    background-color: map.get(colors.$theme-colors, "tertiary");
     padding: 10px;
     padding-right: 20px;
     margin-top: 15px;

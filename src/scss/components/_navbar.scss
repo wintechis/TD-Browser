@@ -9,17 +9,19 @@
     input {
       width: 200px;
       height: 30px;
+      background-color: map.get(colors.$theme-colors, "bg-secondary");
+      border: 0;
     }
   }
 
   .bi-gear {
-    color: white;
+    color: map.get(colors.$theme-colors, "font-primary");
     padding-top: 4px;
     font-size: 25px;
   }
   button {
     background-color: map.get(colors.$theme-colors, "secondary");
-    color: map.get(colors.$theme-colors, "white");
+    color: map.get(colors.$theme-colors, "font-primary");
     width: 78px;
     font-size: 15px;
     font-weight: 600;
@@ -28,7 +30,7 @@
     vertical-align: baseline;
   }
   button:hover {
-    background-color: map.get(colors.$theme-colors, "white");
+    background-color: map.get(colors.$theme-colors, "tertiary");
     color: map.get(colors.$theme-colors, "secondary");
     border: 2px solid map.get(colors.$theme-colors, "secondary");
   }
@@ -45,14 +47,14 @@
       font-weight: 600;
       cursor: pointer;
       padding-top: 8px;
-      color: map.get(colors.$theme-colors, "white");
+      color: map.get(colors.$theme-colors, "bg-secondary");
       background-color: map.get(colors.$theme-colors, "secondary");
-      border: 2px solid map.get(colors.$theme-colors, "white");
+      border: 2px solid map.get(colors.$theme-colors, "tertiary");
       cursor: pointer;
     }
     .currentThingAvatar,
     .thingAvatar:hover {
-      background-color: map.get(colors.$theme-colors, "white");
+      background-color: map.get(colors.$theme-colors, "bg-secondary");
       color: map.get(colors.$theme-colors, "secondary");
       border: 2px solid map.get(colors.$theme-colors, "secondary");
     }
@@ -61,7 +63,7 @@
     margin-top: 5px;
     cursor: pointer;
     &:hover::before {
-      background-color: map.get(colors.$theme-colors, "white");
+      background-color: map.get(colors.$theme-colors, "font-primary");
       color: map.get(colors.$theme-colors, "secondary");
       border: 2px solid map.get(colors.$theme-colors, "secondary");
       border-radius: 15px;

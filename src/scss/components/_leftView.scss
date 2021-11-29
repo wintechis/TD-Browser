@@ -1,6 +1,5 @@
 @use "sass:map";
 @use "../abstract/colors";
-
 #affordance {
   overflow: auto;
   .list-group {
@@ -9,22 +8,26 @@
   }
   .list-group-item {
     background-color: map.get(colors.$theme-colors, "primary");
-    color: map.get(colors.$theme-colors, "white");
+    color: map.get(colors.$theme-colors, "tertiary");
   }
   .card {
     .btn {
       background-color: map.get(colors.$theme-colors, "primary");
-      color: map.get(colors.$theme-colors, "white");
+      color: map.get(colors.$theme-colors, "tertiary");
       &-active {
-        background-color: map.get(colors.$theme-colors, "white");
+        background-color: map.get(colors.$theme-colors, "tertiary");
         color: map.get(colors.$theme-colors, "primary");
         border: 2px solid map.get(colors.$theme-colors, "primary");
       }
     }
+    &-body {
+      background-color: map.get(colors.$theme-colors, "bg-secondary");
+      margin-bottom: 4px;
+    }
   }
 
   .btn-active {
-    background-color: map.get(colors.$theme-colors, "white");
+    background-color: map.get(colors.$theme-colors, "tertiary");
     color: map.get(colors.$theme-colors, "primary");
     border: 2px solid map.get(colors.$theme-colors, "primary");
   }
@@ -55,19 +58,19 @@
   .btn {
     background-color: map.get(colors.$theme-colors, "secondary");
     display: inline-block;
-    color: map.get(colors.$theme-colors, "white");
+    color: map.get(colors.$theme-colors, "tertiary");
     // border-radius: 3px;
     // margin-right: 3px;
     height: 30px;
     padding: 0;
     &-active {
-      background-color: map.get(colors.$theme-colors, "white");
+      background-color: map.get(colors.$theme-colors, "tertiary");
       color: map.get(colors.$theme-colors, "secondary");
       border: 2px solid map.get(colors.$theme-colors, "secondary");
     }
   }
   .btn:hover {
-    background-color: map.get(colors.$theme-colors, "white");
+    background-color: map.get(colors.$theme-colors, "tertiary");
     color: map.get(colors.$theme-colors, "secondary");
     border: 2px solid map.get(colors.$theme-colors, "secondary");
   }

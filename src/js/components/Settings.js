@@ -11,7 +11,7 @@ class Settings {
       defaultSettings = {
         notificationSound: true,
         logs: "onlyNotifications",
-        theme: "FAU_new",
+        theme: "default",
       };
       localStorage.setItem("settings", JSON.stringify(defaultSettings));
     }
@@ -25,7 +25,7 @@ class Settings {
           }>
           </div>
           </div>
-        <label class="form-select-label" for="settings-logs">logs</label>
+        <label class="form-select-label" for="settings-Logs">logs</label>
         <select id="settings-logs" class="form-select" aria-label="">
           <option 
             ${defaultSettings.logs === "onlyNotifications" ? "selected" : ""} 
@@ -35,6 +35,17 @@ class Settings {
           ${
             defaultSettings.logs === "all" ? "selected" : ""
           }  value="all">All</option>
+        </select>
+        <label class="form-select-label" for="settings-theme">Theme</label>
+        <select id="settings-theme" class="form-select" aria-label="">
+          <option 
+            ${defaultSettings.theme === "default" ? "selected" : ""} 
+            value="default">Default
+          </option>
+          <option 
+          ${
+            defaultSettings.theme === "dark" ? "selected" : ""
+          }  value="dark">Dark</option>
         </select>
   </div>`;
   }
@@ -46,6 +57,7 @@ class Settings {
     let settings = {
       notificationSound: $("#notificationSound").is(":checked"),
       logs: $("#settings-logs").val(),
+      theme: $("#settings-theme").val(),
     };
     localStorage.setItem("settings", JSON.stringify({ ...settings }));
     this.appendSettingsForm();
@@ -60,6 +72,10 @@ class Settings {
     } else {
       $(selectedElements).show();
     }
+    document
+      .getElementsByTagName("body")[0]
+      .setAttribute("data-theme", settings.theme);
+    // $("body")[0].attr("data-theme", "dark");
   }
   isNotificationSoundOn() {
     return JSON.parse(localStorage.getItem("settings")).notificationSound;
@@ -69,6 +85,7 @@ class Settings {
       document.getElementById("notificationAudio").play();
   }
   #htmlElement() {
+    this.applySettings();
     return `
     <div id="settingsIcon" class="bi-gear" data-bs-toggle="modal" data-bs-target="#settingsModal" ></div>
     <div class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" id="settingsModal" tabindex="-1" aria-labelledby="settingsModalLabel" aria-hidden="true">

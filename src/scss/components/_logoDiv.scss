@@ -1,10 +1,14 @@
+@use "sass:map";
+@use "../abstract/colors";
+
 #logoDiv {
+  background-color: map.get(colors.$theme-colors, "bg-primary");
   display: grid;
   img {
     margin: auto;
     width: 50%;
-    border: 15px solid white;
-    border-radius: 10px;
+    border: 15px solid map.get(colors.$theme-colors, "bg-primary");
+    border-radius: 30px;
     padding: 0;
     overflow: hidden;
   }

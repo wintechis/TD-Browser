@@ -2,16 +2,47 @@
 @use "../abstract/colors";
 
 #settingsModal {
-  input[type="checkbox"] {
+  .modal-content {
+    background-color: map.get(colors.$theme-colors, "bg-primary");
+    color: map.get(colors.$theme-colors, "font-secondary");
+  }
+  .modal {
+    &-header,
+    &-footer {
+      padding: 5px;
+      text-align: center;
+      height: 45px;
+      background-color: map.get(colors.$theme-colors, "primary");
+      border: 0;
+      color: map.get(colors.$theme-colors, "font-primary");
+    }
   }
   .form-check {
     margin-left: 15px;
     display: inline-block;
     vertical-align: middle;
+    color: map.get(colors.$theme-colors, "font-primary");
+  }
+  label {
+    width: 30%;
   }
   select {
+    color: map.get(colors.$theme-colors, "font-primary");
     margin-left: 15px;
-    width: 200px;
+    margin-bottom: 5px;
+    width: 50%;
     display: inline-block;
+    background-color: map.get(colors.$theme-colors, "primary");
+  }
+  .form-check-input {
+    &:checked {
+      background-color: map.get(colors.$theme-colors, "primary");
+      border-color: map.get(colors.$theme-colors, "primary");
+    }
+    &:focus {
+      border-color: map.get(colors.$theme-colors, "bg-primary");
+      outline: 0;
+      box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
   }
 }

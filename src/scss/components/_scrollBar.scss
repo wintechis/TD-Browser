@@ -1,0 +1,7 @@
+@use "sass:map";
+@use "../abstract/colors";
+div {
+  scrollbar-width: thin;
+  scrollbar-color: map.get(colors.$theme-colors, "primary")
+    map.get(colors.$theme-colors, "bg-primary");
+}

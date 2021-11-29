@@ -12,9 +12,11 @@
     flex-direction: column-reverse;
   }
   .card {
+    border: none;
     &-header,
     &-footer {
       cursor: pointer;
+      border: none;
     }
     &-header {
       text-align: left;
@@ -27,17 +29,22 @@
     }
     width: 90%;
     &-body {
+      background-color: map.get(colors.$theme-colors, "bg-secondary");
       text-align: left;
       height: auto;
     }
     &-request {
+      .card-header,
+      .card-footer {
+        color: map.get(colors.$theme-colors, "font-primary");
+        background-color: map.get(colors.$theme-colors, "primary");
+      }
     }
     &-response {
       margin-left: auto;
       .card-header,
       .card-footer {
-        color: map.get(colors.$theme-colors, "white");
-        border: 1px solid map.get(colors.$theme-colors, "white");
+        color: map.get(colors.$theme-colors, "tertiary");
         background-color: green;
       }
       .card-footer {
@@ -45,7 +52,7 @@
       &-failed {
         .card-header,
         .card-footer {
-          color: map.get(colors.$theme-colors, "white");
+          color: map.get(colors.$theme-colors, "tertiary");
           background-color: red;
         }
       }

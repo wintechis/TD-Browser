@@ -2,7 +2,7 @@
 @use "../abstract/colors";
 #footer {
   background-color: map.get(colors.$theme-colors, "primary");
-  color: map.get(colors.$theme-colors, "white");
+  color: map.get(colors.$theme-colors, "font-primary");
   text-align: center;
   height: 25px;
   padding-top: 4px;

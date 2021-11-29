@@ -1,13 +1,16 @@
+@use "sass:map";
+@use "./abstract/colors";
+
 #main {
   display: grid;
   grid: 0px;
   grid-template-columns: 100vw;
   height: 100vh;
   grid-template-rows: 50px calc(100% - 75px) calc(100% - 75px) 25px;
-
   margin: 0;
   padding: 0;
   #bodyDiv {
+    background-color: map.get(colors.$theme-colors, "bg-primary");
     display: grid;
     grid: 0px;
     grid-template-columns: 1fr 1fr 1fr;
@@ -22,6 +25,7 @@
 #leftViewContainer,
 #middleViewContainer,
 #rightViewContainer {
+  background-color: map.get(colors.$theme-colors, "bg-secondary");
   padding: 20px 20px;
   display: grid;
   grid: 0px;
@@ -37,7 +41,7 @@
   }
   .body-row-2 {
     width: 100%;
-    background-color: #edf1f6;
+    background-color: map.get(colors.$theme-colors, "bg-primary");
     padding: 10px;
     border-radius: 15px;
   }
