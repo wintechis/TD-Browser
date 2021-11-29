@@ -149,6 +149,8 @@ class MiddleView {
           }
           return input;
         });
+    } else if (inputs.length === 0) {
+      inputs = [{}];
     } else {
       if (
         this.#currentAction.types[inputs[0].name] === "integer" ||
