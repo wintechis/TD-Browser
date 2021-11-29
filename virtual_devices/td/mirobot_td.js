@@ -70,7 +70,7 @@ module.exports = {
       forms: [
         {
           href: "mirobot/actions/pick_box",
-          contentType: "application/json",
+          contentType: "text/plain",
           op: ["invokeaction"],
           "htv:methodName": "POST",
         },
