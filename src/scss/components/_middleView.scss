@@ -98,6 +98,16 @@
         }
       }
     }
+    .JsonFormatter {
+      max-height: 57vh;
+    }
+    #middleView-propertyForm-input {
+      display: block;
+      margin: 40px auto 20px;
+    }
+    button[type="submit"] {
+      display: block;
+    }
   }
 }
 #middleView--refreshIcon {
