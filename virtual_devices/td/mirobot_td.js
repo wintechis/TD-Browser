@@ -27,7 +27,7 @@ module.exports = {
     },
     current_box: {
       type: "string",
-      description: "to know the current box that mirobot is holding",
+      description: "to know the current box that the mirobot is holding",
       readOnly: true,
       forms: [
         {
@@ -38,6 +38,7 @@ module.exports = {
       ],
     },
     boxes: {
+      description: "to know the all the available boxes",
       output: {
         type: "array",
       },
@@ -90,6 +91,8 @@ module.exports = {
   },
   events: {
     red_box: {
+      description:
+        "will notify the client if the red box was picked or dropped",
       data: { type: "string" },
       forms: [
         {
@@ -101,6 +104,8 @@ module.exports = {
       ],
     },
     blue_box: {
+      description:
+        "will notify the client if the blue box was picked or dropped",
       data: { type: "string" },
       forms: [
         {
@@ -112,6 +117,8 @@ module.exports = {
       ],
     },
     green_box: {
+      description:
+        "will notify the client if the green box was picked or dropped",
       data: { type: "string" },
       forms: [
         {
@@ -123,6 +130,8 @@ module.exports = {
       ],
     },
     yellow_box: {
+      description:
+        "will notify the client if the yellow box was picked or dropped",
       data: { type: "string" },
       forms: [
         {
