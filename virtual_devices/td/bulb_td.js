@@ -6,6 +6,7 @@ module.exports = {
   security: "nosec_sc",
   properties: {
     status: {
+      description: "To know the current status for the bulb",
       type: "string",
       readOnly: false,
       writeOnly: false,
@@ -21,6 +22,7 @@ module.exports = {
   },
   actions: {
     toggle: {
+      description: "To turn the bulb on or of",
       forms: [
         {
           href: "http://localhost:3001/bulb/actions/toggle",
@@ -33,19 +35,19 @@ module.exports = {
       safe: false,
     },
   },
-  events: {
-    overheating: {
-      data: { type: "string" },
-      forms: [
-        {
-          href: "http://localhost:3001/bulb/events/overheating",
-          contentType: "application/json",
-          subprotocol: "longpoll",
-          op: ["subscribeevent", "unsubscribeevent"],
-        },
-      ],
-    },
-  },
+  // events: {
+  //   overheating: {
+  //     data: { type: "string" },
+  //     forms: [
+  //       {
+  //         href: "http://localhost:3001/bulb/events/overheating",
+  //         contentType: "application/json",
+  //         subprotocol: "longpoll",
+  //         op: ["subscribeevent", "unsubscribeevent"],
+  //       },
+  //     ],
+  //   },
+  // },
   "@type": "Thing",
   forms: [
     {
