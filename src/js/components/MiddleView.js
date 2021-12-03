@@ -257,7 +257,10 @@ class MiddleView {
         actionObj.hasOwnProperty("input")
           ? actionObj.input.maximum
           : actionObj.maximum,
-        true
+        true,
+        actionObj.hasOwnProperty("input")
+          ? actionObj.input.unit
+          : actionObj.unit
       );
       $(inputsContainer).append(formField);
     }
@@ -275,7 +278,8 @@ class MiddleView {
     enumArray,
     min,
     max,
-    required
+    required,
+    unit
   ) {
     let div = $.parseHTML(
       `<div class="btn-group" role="group" aria-label="Basic radio toggle button group"></div>`
@@ -287,6 +291,21 @@ class MiddleView {
         required ? "required" : ""
       }></select> `
     );
+    let placeholder;
+    if (unit && typeof max === "number" && typeof min === "number") {
+      placeholder = ` ${min} ${unit} to ${max} ${unit}`;
+    } else if ((unit && typeof max === "number") || typeof min === "number") {
+      placeholder =
+        typeof max === "number" ? `Max: ${max} ${unit}` : `Min: ${min} ${unit}`;
+    } else if (unit) {
+      placeholder = "Uint: " + unit;
+    } else if (typeof max === "number" && typeof min === "number") {
+      placeholder = ` ${min} to ${max}`;
+    } else if (typeof max === "number" || typeof min === "number") {
+      typeof max === "number" ? `Max: ${max}` : `Min: ${min}`;
+    } else {
+      placeholder = undefined;
+    }
     if (typeof enumArray !== "undefined") {
       // if (enumArray.length < 5) {
       //   enumArray.forEach((val, idx) =>
@@ -303,7 +322,6 @@ class MiddleView {
         $(select).append(`<option  value="${val}" >${val}</option>`)
       );
       // }
-
       $(formElement).append(
         `<div class=""> 
         ${title !== undefined ? collapseSpanElement(title, title) : ""}        
@@ -331,7 +349,9 @@ class MiddleView {
             ${title !== undefined ? descriptionString(title, description) : ""}
             <input type="number" class="form-control" step="1"  id="middleView-formField-${title}" min="${
             min ? min : ""
-          }" max="${max ? max : ""}" ${required ? "required" : ""}></div>`
+          }" max="${max ? max : ""}" ${
+            required ? "required" : ""
+          } placeholder="${placeholder ? placeholder : ""}"></div>`
         )
       );
     } else if (type === "number") {
@@ -343,7 +363,9 @@ class MiddleView {
             ${title !== undefined ? descriptionString(title, description) : ""}
             <input type="number" step="any" class="form-control " id="middleView-formField-${title}" min="${
             min ? min : ""
-          }" max="${max ? max : ""}" ${required ? "required" : ""}></div>`
+          }" max="${max ? max : ""}" ${
+            required ? "required" : ""
+          } placeholder="${placeholder ? placeholder : ""}></div>`
         )
       );
     } else if (type === "boolean") {
