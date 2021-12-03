@@ -40,7 +40,7 @@ class Settings {
         <select id="settings-theme" class="form-select" aria-label="">
           <option 
             ${defaultSettings.theme === "default" ? "selected" : ""} 
-            value="default">Default
+            value="default">Light
           </option>
           <option 
           ${
