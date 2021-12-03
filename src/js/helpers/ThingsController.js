@@ -300,7 +300,6 @@ class ThingsController {
     if (!this.hasCurrentThing) return null;
     const thingId = this.currentThingID;
     const requestDate = Date.now().toString();
-    console.log("***********************" + payload.length);
     const data =
       payload.length > 2
         ? [payload[0], { ...payload[2].uriVariables }]
@@ -338,14 +337,14 @@ class ThingsController {
         const responseDate = Date.now().toString();
         this.#logger.saveResponse(
           "invokeAction",
-          [],
+          [error.message],
           thingId,
           requestDate,
           responseDate,
           false
         );
 
-        return error;
+        return error.message;
       }); //TypeError: e is undefined === no credentials
   }
   subscribeEvent(event) {
