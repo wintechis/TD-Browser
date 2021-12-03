@@ -70,7 +70,8 @@ class Navbar {
         try {
           if (
             file[0].type !== "application/json" &&
-            file[0].type !== "application/ld+json"
+            file[0].type !== "application/ld+json" &&
+            file[0].name.split(".")[1] !== "jsonld"
           ) {
             throw "Select only a file of type JSON!";
           } else if (file[0].size === 0) {
