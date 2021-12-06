@@ -43,7 +43,6 @@ class RightView {
   #onSubmit() {}
   appendRequestToView(title, request) {
     const formattedTime = this.#formatTime(request.date);
-    console.log(request);
     let formattedData;
     if (
       [
