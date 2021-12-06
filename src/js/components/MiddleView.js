@@ -211,7 +211,8 @@ class MiddleView {
           uriVariable.enum,
           uriVariable.minimum,
           uriVariable.maximum,
-          true
+          true,
+          uriVariable.unit
         );
         $(inputsContainer).append(formFields);
       });
@@ -232,7 +233,10 @@ class MiddleView {
           propertyObject.enum,
           propertyObject.minimum,
           propertyObject.maximum,
-          actionObj.input.required.includes(val) ? true : false
+          actionObj.input.required && actionObj.input.required.includes(val)
+            ? true
+            : false,
+          propertyObject.unit
         );
         $(inputsContainer).append(formFields);
       });
@@ -281,6 +285,17 @@ class MiddleView {
     required,
     unit
   ) {
+    console.log([
+      formElement,
+      type,
+      title,
+      description,
+      enumArray,
+      min,
+      max,
+      required,
+      unit,
+    ]);
     let div = $.parseHTML(
       `<div class="btn-group" role="group" aria-label="Basic radio toggle button group"></div>`
     );
@@ -360,12 +375,16 @@ class MiddleView {
           `<div class="">${
             title !== undefined ? collapseSpanElement(title, title) : ""
           }   
-            ${title !== undefined ? descriptionString(title, description) : ""}
+            ${
+              title !== undefined && description !== undefined
+                ? descriptionString(title, description)
+                : ""
+            }
             <input type="number" step="any" class="form-control " id="middleView-formField-${title}" min="${
             min ? min : ""
           }" max="${max ? max : ""}" ${
             required ? "required" : ""
-          } placeholder="${placeholder ? placeholder : ""}></div>`
+          } placeholder="${placeholder ? placeholder : ""}"></div>`
         )
       );
     } else if (type === "boolean") {
@@ -534,6 +553,7 @@ class MiddleView {
     $("#middleView-content").append(formatter);
   }
   async appendPropertyResponse(property) {
+    console.log(property);
     this.#currentProperty = property;
     this.resetMiddleView();
     let response = await this.#tc.readProperty(...property);
