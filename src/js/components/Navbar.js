@@ -13,7 +13,7 @@ class Navbar {
             <form id="consumingForm" class="p-2 d-inline-block">
               <input class=" p-2 " type="url" name="thingURL" id="thingURL" placeholder="URL" ia-label="Search">
               <input class=" p-2 "type="file" name="thingFile" id="fileInput">
-              <button class="btn" id="fileInputTrigger" type="button">Upload</button> 
+              <button class="btn" id="fileInputTrigger" style="display:none" type="button">Upload</button> 
               <button class="btn" type="submit" id="consumeButton" >Consume</button>
             </form>
             <div id="thingsAvatarContainer" class="d-inline "></div>
@@ -46,7 +46,9 @@ class Navbar {
           break;
         case "consumeButton":
           e.preventDefault();
-          this.#onSubmit();
+          $("#thingURL").val().length
+            ? this.#onSubmit()
+            : $("#fileInput").trigger("click");
           break;
         case "thingAvatar":
           this.#changeCurrentThing(e.target.id);
@@ -77,7 +79,7 @@ class Navbar {
           } else if (file[0].size === 0) {
             throw "The selected file is empty!";
           } else {
-            $("#thingURL").val(file[0].name);
+            this.#onSubmit();
           }
         } catch (error) {
           $("#consumingForm").trigger("reset");
@@ -94,9 +96,6 @@ class Navbar {
     let url = $("#thingURL").val();
     let key = false;
     $("#consumeButton").html(spinnerElement);
-    // let previousThingID = this.#tc.hasCurrentThing()
-    //   ? this.#tc.currentThingID
-    //   : undefined;
     if (files.length > 0) {
       let td = await helpers.fileToJSON(files[0]);
       await this.#tc.consume(td);
