@@ -47,6 +47,7 @@ class RightView {
     if (
       [
         "readProperty",
+        "readAllProperties",
         "observeProperty",
         "unobserveProperty",
         "subscribeEvent",

@@ -11,11 +11,15 @@ class Logger {
         td,
         invokeAction: {},
         readProperty: {},
+        readAllProperties: {},
+        readMultipleProperties: {},
         observeProperty: {},
         unobserveProperty: {},
         subscribeEvent: {},
         unsubscribeEvent: {},
         writeProperty: {},
+        writeAllProperties: {},
+        writeMultipleProperties: {},
       })
     );
   }

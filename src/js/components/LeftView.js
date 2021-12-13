@@ -69,7 +69,7 @@ class LeftView {
           break;
         case "property":
           this.highlightButton(elementID);
-          this.#mv.appendPropertyResponse(elementID.split("--").splice(1, 2));
+          this.#mv.appendProperty(elementID.split("--").splice(1, 2));
           break;
         case "event":
           this.highlightButton(elementID);
@@ -143,7 +143,10 @@ class LeftView {
   }
   #appendProperties() {
     this.#resetAffordance();
-    let properties = this.#tc.getPropertiesTD();
+    let properties = {
+      ...this.#tc.getToplevelForms(),
+      ...this.#tc.getPropertiesTD(),
+    };
     let listGroupElement = $.parseHTML(`<div class="list-group"></div>`);
     Object.keys(properties).forEach((property) => {
       let hasUriVariables =

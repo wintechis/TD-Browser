@@ -79,10 +79,10 @@ class MiddleView {
           break;
         case "middleView--editIcon":
           $(".middleView-affordanceTitleContainer").nextAll().remove();
-          this.#editProperty();
+          this.#appendUpdatePropertyForm([this.#currentProperty[0]], true);
           break;
         case "middleView--refreshIcon":
-          this.appendPropertyResponse(this.#currentProperty);
+          this.appendProperty(this.#currentProperty);
           break;
         case "middleView--backIcon":
           this.appendActionForm(this.#currentAction.actionName);
@@ -114,6 +114,11 @@ class MiddleView {
         case "middleView--credentialForm":
           this.#submitCredential(e);
           this.#deleteForm();
+          break;
+        case "middleView-readMultiplePropertiesForm":
+          this.#handleReadMultiplePropertiesForm();
+          this.#deleteForm();
+
           break;
         default:
           break;
@@ -474,64 +479,83 @@ class MiddleView {
     );
     this.#LV.toggleObserveIcon(this.#tc.currentProperty[0]);
   }
-  #editProperty() {
-    let property = this.#tc.currentProperty[0];
-    let properties = this.#tc.getPropertiesTD();
-    let propertyType = properties[property].type;
-    // integer // number // boolean //string
-    let inputElement;
-    if (propertyType === "integer") {
-      inputElement = `<input type="number" name="integer" id="middleView-propertyForm-input" step="1" required/>`;
-    } else if (propertyType === "number") {
-      inputElement = `<input type="number"  name="number"  id="middleView-propertyForm-input" required/>`;
-    } else if (propertyType === "boolean") {
-      inputElement = `
-      <div>
-        <input  class="" type="radio" name="boolean" id="inlineRadio1" value="true">
-        <label class="btn" for="inlineRadio1">True</label>
-        <input class="" type="radio" name="boolean" id="inlineRadio2" value="false">
-        <label class="btn" for="inlineRadio2">False</label>
-      </div>
+  #appendUpdatePropertyForm(properties, isRequired) {
+    let inputElements = "";
+    let propertiesTD = this.#tc.getPropertiesTD();
+    properties.forEach((property, indx) => {
+      let propertyType = propertiesTD[property].type;
+      if (propertyType === "integer") {
+        inputElements += `<label>${property} <input type="number" ${
+          isRequired ? "required" : ""
+        } 
+        name="${property}--integer" id="middleView-propertyForm-input-${indx}" step="1" /></label>`;
+      } else if (propertyType === "number") {
+        inputElements += `<label>${property} <input type="number" ${
+          isRequired ? "required" : ""
+        } 
+        name="${property}--number"  id="middleView-propertyForm-input-${indx}" /></label>`;
+      } else if (propertyType === "boolean") {
+        inputElements += `
+        <label>${property}    <select class="form-select"  ${
+          isRequired ? "required" : ""
+        }
+         name="${property}--boolean" > 
+        <option selected>Select a Boolean Value/option>
+        <option value="true">True</option>
+        <option value="false">False</option>
+        </select></label>
         `;
-
-      // `
-      // <div class=" btn-group " role="group" aria-label="Basic radio toggle button group">
-      //   <div class="form-check">
-      //     <input type="radio" class="btn-check " name="boolean"  value="true"       id="middleView-propertyForm-input-true" autocomplete="off"><label class="btn   actionFormSelectButton"  checked for="middleView-propertyForm-input-true">True</label>
-      //   </div>
-      //   <div class="form-check">
-      //     <input type="radio"   class="btn-check " name="boolean"  value="false"    id="middleView-propertyForm-input-false"  autocomplete="off" ><label class="btn  actionFormSelectButton"    for="middleView-propertyForm-input-true">False</label>
-      //   </div>
-      // </div>`;
-    } else if (propertyType === "string") {
-      inputElement = `<input type="text"  name="string"  id="middleView-propertyForm-input" required/>`;
-    } else {
-      throw new Error("Property Type not supported");
-    }
+      } else if (propertyType === "string") {
+        inputElements += `<label>${property} <input type="text" ${
+          isRequired ? "required" : ""
+        }  
+        name="${property}--string"  id="middleView-propertyForm-input-${indx}" /> </label>`;
+      }
+    });
     let formElement = $.parseHTML("<form id='middleView-propertyForm'></form>");
     let submitButtonElement = `<button class="btn" type="submit">Update</button>`;
-    $(formElement).append(inputElement, submitButtonElement);
+    $(formElement).append(inputElements, submitButtonElement);
     $("#middleView-content > .json-formatter-row").remove();
     $("#middleView-content").append(formElement);
   }
   async #submitProperty() {
-    let input = $("#middleView-propertyForm").serializeArray()[0];
-    let value;
-    switch (input.name) {
-      case "number":
-        value = +input.value;
+    let inputs = $("#middleView-propertyForm")
+      .serializeArray()
+      .reduce((acc, input) => {
+        let type = input.name.split("--")[1];
+        let key = input.name.split("--")[0];
+        let value;
+        switch (type) {
+          case "number":
+            value = +input.value;
+            break;
+          case "integer":
+            value = Math.floor(+input.value);
+            break;
+          case "boolean":
+            value = input.value === "true";
+            break;
+          default:
+            value = input.value;
+            break;
+        }
+        return value.length === 0 ? { ...acc } : { ...acc, [key]: value };
+      }, {});
+    let response;
+    switch (this.#currentProperty[0]) {
+      case "writeallproperties":
+        response = await this.#tc.writeAllProperties(inputs);
         break;
-      case "integer":
-        value = +input.value;
-        break;
-      case "boolean":
-        value = input.value === "true";
+      case "writemultipleproperties":
+        response = await this.#tc.writeMultipleProperties(inputs);
         break;
       default:
-        value = input.value;
+        response = await this.#tc.writeProperty(
+          inputs[this.#currentProperty[0]]
+        );
         break;
     }
-    let response = await this.#tc.writeProperty(value);
+
     let alertElement;
     let formatter = $.parseHTML(`<div class="JsonFormatter"></div>`);
     if (response.status) {
@@ -552,12 +576,29 @@ class MiddleView {
     $(alertElement).append(formatter);
     $("#middleView-content").append(formatter);
   }
-  async appendPropertyResponse(property) {
-    console.log(property);
+  async #handleReadMultiplePropertiesForm() {
+    let properties = $("#middleView-readMultiplePropertiesForm")
+      .serializeArray()
+      .map((input) => {
+        return input.name;
+      });
+    let response = await this.#tc.readMultipleProperties(properties);
+    let formatter = $.parseHTML(`<div class="JsonFormatter"></div>`);
+    $(formatter).append(new JSONFormatter(response, 1).render());
+    $("#middleView-content").append(formatter);
+  }
+  async appendProperty(property) {
     this.#currentProperty = property;
     this.resetMiddleView();
-    let response = await this.#tc.readProperty(...property);
-    let propertyDescription = this.#tc.getPropertyDescription(property[0]);
+    let isTopLevelForm = [
+      "readallproperties",
+      "readmultipleproperties",
+      "writeallproperties",
+      "writemultipleproperties",
+    ].includes(property[0]);
+    let propertyDescription = isTopLevelForm
+      ? undefined
+      : this.#tc.getPropertyDescription(property[0]);
     let title =
       property.length === 2
         ? property.toString().replace(",", " : ")
@@ -566,47 +607,78 @@ class MiddleView {
       `<div class="middleView-affordanceTitleContainer"></div>`
     );
     let collapseSpan = $.parseHTML(`<div></div>`);
-    $(collapseSpan).append(
-      collapseSpanElement(property[0], title),
-      refreshIcon
-    );
-    this.#tc.isPropertyObservable(property[0]) &&
+    $(collapseSpan).append(collapseSpanElement(property[0], title));
+    !isTopLevelForm &&
+      this.#tc.isPropertyObservable(property[0]) &&
       $(collapseSpan).append(
         this.#tc.isPropertyObserved() ? observeIconActive : observeIcon
       );
-    this.#tc.isPropertyReadOnly(property[0]) &&
+    if (property[0] === "readallproperties") {
+      $(collapseSpan).append(refreshIcon);
+      $(affordanceTitleContainer).append(collapseSpan);
+      $("#middleView-content").append(affordanceTitleContainer);
+      let response = await this.#tc.readAllProperties();
+      let formatter = $.parseHTML(`<div class="JsonFormatter"></div>`);
+      $(formatter).append(new JSONFormatter(response, 1).render());
+      $("#middleView-content").append(formatter);
+    } else if (property[0] === "readmultipleproperties") {
+      $(affordanceTitleContainer).append(collapseSpan);
+      let readableProperties = this.#tc.getReadableProperties();
+      let formElement = `<form id="middleView-readMultiplePropertiesForm" class="form-check">${readableProperties.reduce(
+        (acc, curr) => {
+          return (
+            acc +
+            `<label class="form-check-label" for="flexCheckDefault">${curr} <input class="form-check-input" name="${curr}" type="checkbox" value=""></label>`
+          );
+        },
+        ""
+      )}<button type="submit">Read</button></form>`;
+      $("#middleView-content").append(affordanceTitleContainer, formElement);
+    } else if (property[0] === "writeallproperties") {
+      $(affordanceTitleContainer).append(collapseSpan);
+      $("#middleView-content").append(affordanceTitleContainer);
+      let writableProperties = this.#tc.getWritableProperties();
+      this.#appendUpdatePropertyForm(writableProperties, true);
+    } else if (property[0] === "writemultipleproperties") {
+      $(affordanceTitleContainer).append(collapseSpan);
+      $("#middleView-content").append(affordanceTitleContainer);
+      let writableProperties = this.#tc.getWritableProperties();
+      this.#appendUpdatePropertyForm(writableProperties, false);
+    } else if (
+      this.#tc.isPropertyWritable(property[0]) &&
+      this.#tc.isPropertyReadable(property[0])
+    ) {
+      $(collapseSpan).append(refreshIcon);
       $(collapseSpan).append(editIcon);
-    $(affordanceTitleContainer).append(
-      collapseSpan,
-      descriptionString(property[0], propertyDescription)
-    );
-    $("#middleView-content").append(affordanceTitleContainer);
-    let formatter = $.parseHTML(`<div class="JsonFormatter"></div>`);
-    $(formatter).append(new JSONFormatter(response, 1).render());
-    $("#middleView-content").append(formatter);
-    // let actionForm = this.#generateActionForm(actionName, actionObj);
-    // $("#middleView-content").append(formTitleElement, actionForm);
-
-    //     thing
-    //     .readProperty(property)
-    //     .then((res) => {
-    //       if (things[currentThing.id].key.hasKey) {
-    //         login.showKey("green");
-    //       }
-    //       viewResponse(
-    //         property,
-    //         res,
-    //         { updatable, thing, property },
-    //         { observable, thing, property }
-    //       );
-    //     })
-    //     .catch((err) => {
-    //       if (err.toString().includes("Unauthorized")) {
-    //         login.showKey("red");
-    //       }
-    //       console.log("error: " + err);
-    //     });
-    // });
+      $(affordanceTitleContainer).append(
+        collapseSpan,
+        descriptionString(property[0], propertyDescription)
+      );
+      $("#middleView-content").append(affordanceTitleContainer);
+      let response = await this.#tc.readProperty(...property);
+      let formatter = $.parseHTML(`<div class="JsonFormatter"></div>`);
+      $(formatter).append(new JSONFormatter(response, 1).render());
+      $("#middleView-content").append(formatter);
+    } else if (this.#tc.isPropertyWritable(property[0])) {
+      $(collapseSpan).append(editIcon);
+      $(affordanceTitleContainer).append(
+        collapseSpan,
+        descriptionString(property[0], propertyDescription)
+      );
+      $("#middleView-content").append(affordanceTitleContainer);
+      this.#appendUpdatePropertyForm([property[0]], true);
+    } else if (this.#tc.isPropertyReadable(property[0])) {
+      $(collapseSpan).append(refreshIcon);
+      $(affordanceTitleContainer).append(
+        collapseSpan,
+        descriptionString(property[0], propertyDescription)
+      );
+      $("#middleView-content").append(affordanceTitleContainer);
+      let response = await this.#tc.readProperty(...property);
+      let formatter = $.parseHTML(`<div class="JsonFormatter"></div>`);
+      $(formatter).append(new JSONFormatter(response, 1).render());
+      $("#middleView-content").append(formatter);
+    }
   }
   appendEvent(event) {
     this.resetMiddleView();

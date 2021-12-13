@@ -57,7 +57,10 @@ class ThingsController {
 
   async consume(td) {
     if (!td.hasOwnProperty("id") || td.id.length === 0) {
-      td.id = Date.now();
+      td.id = Date.now().toString();
+    }
+    if (!td.hasOwnProperty("title") || td.title.length === 0) {
+      td.title = Date.now().toString();
     }
     let servient = new Wot.Core.Servient();
     servient.addClientFactory(new Wot.Http.HttpsClientFactory(null));
@@ -123,13 +126,24 @@ class ThingsController {
     }
   }
 
-  isPropertyReadOnly(property) {
-    if (!this.hasCurrentThing) return null;
-    return this.getPropertyTD(property).readOnly === false;
+  isPropertyReadable(property) {
+    let propertyTD = this.getPropertyTD(property);
+    return !propertyTD.hasOwnProperty("writeOnly") || !propertyTD.writeOnly;
   }
+  isPropertyWritable(property) {
+    let propertyTD = this.getPropertyTD(property);
+    return !propertyTD.hasOwnProperty("readOnly") || !propertyTD.readOnly;
+  }
+
   getPropertyTD(property) {
     if (!this.hasCurrentThing) return null;
     return this.getPropertiesTD()[property];
+  }
+  getToplevelForms() {
+    if (!this.hasCurrentThing) return null;
+    return this.#getTD()["forms"].reduce((acc, curr) => {
+      return { [curr.op]: {}, ...acc };
+    }, {});
   }
   getEventTD(event) {
     if (!this.hasCurrentThing) return null;
@@ -182,6 +196,122 @@ class ThingsController {
       const index = this.#observedProperties[thing.id].indexOf(propertyName);
       if (index > -1) this.#observedProperties[thing.id].splice(index, 1);
     }
+  }
+  async writeAllProperties(properties) {
+    console.log(properties);
+    const requestDate = Date.now().toString();
+    const thingId = this.currentThingID;
+    const thing = this.#currentThing;
+    this.#logger.saveRequest(
+      "writeAllProperties",
+      [properties],
+      thingId,
+      requestDate
+    );
+    thing
+      .writeAllProperties(properties)
+      .then((response) => {
+        const responseDate = Date.now().toString();
+        this.#logger.saveResponse(
+          "writeAllProperties",
+          [response],
+          thingId,
+          requestDate,
+          responseDate,
+          true
+        );
+
+        return { status: true, data: response };
+      })
+      .catch((error) => {
+        const responseDate = Date.now().toString();
+        this.#logger.saveResponse(
+          "writeAllProperties",
+          [error],
+          thingId,
+          requestDate,
+          responseDate,
+          false
+        );
+        return { status: false, data: error };
+      });
+    // let url =
+    //   propertyForm.href.split("{?id}")[0] +
+    //   (uriVariable ? "?id=" + uriVariable : "");
+    // let config = {
+    //   method: "put",
+    //   url,
+    //   headers: {
+    //     "Content-Type": propertyForm.contentType,
+    //   },
+    //   data: JSON.stringify(value),
+    // };
+
+    // return await axios(config)
+    //   .then((response) => {
+    //     const responseDate = Date.now().toString();
+    //     this.#logger.saveResponse(
+    //       "writeProperty",
+    //       response.data,
+    //       thingId,
+    //       requestDate,
+    //       responseDate,
+    //       true
+    //     );
+
+    //     return { status: true, data: response.data };
+    //   })
+    //   .catch((error) => {
+    //     const responseDate = Date.now().toString();
+    //     this.#logger.saveResponse(
+    //       "writeProperty",
+    //       error,
+    //       thingId,
+    //       requestDate,
+    //       responseDate,
+    //       false
+    //     );
+    //     return { status: false, data: error.data };
+    //   });
+  }
+  async writeMultipleProperties(properties) {
+    console.log(properties);
+    const requestDate = Date.now().toString();
+    const thingId = this.currentThingID;
+    const thing = this.#currentThing;
+    this.#logger.saveRequest(
+      "writeMultipleProperties",
+      [properties],
+      thingId,
+      requestDate
+    );
+    thing
+      .writeMultipleProperties(properties)
+      .then((response) => {
+        const responseDate = Date.now().toString();
+        this.#logger.saveResponse(
+          "writeMultipleProperties",
+          [response],
+          thingId,
+          requestDate,
+          responseDate,
+          true
+        );
+
+        return { status: true, data: response };
+      })
+      .catch((error) => {
+        const responseDate = Date.now().toString();
+        this.#logger.saveResponse(
+          "writeMultipleProperties",
+          [error],
+          thingId,
+          requestDate,
+          responseDate,
+          false
+        );
+        return { status: false, data: error };
+      });
   }
   async writeProperty(value) {
     let propertyName = this.#currentProperty[0];
@@ -247,7 +377,108 @@ class ThingsController {
     if (!this.hasCurrentThing) return null;
     return this.getEventTD(property).description;
   }
+  getReadableProperties() {
+    return Object.keys(this.getPropertiesTD()).filter(
+      (property) => this.isPropertyReadable
+    );
+  }
+  getWritableProperties() {
+    return Object.keys(this.getPropertiesTD()).filter((property) =>
+      this.isPropertyWritable(property)
+    );
+  }
 
+  readAllProperties() {
+    this.#currentProperty = ["readallproperties"];
+    let requestDate = Date.now().toString();
+    let responseDate;
+    let thingId = this.currentThingID;
+    this.#logger.saveRequest(
+      "readAllProperties",
+      ["readallproperties"],
+      thingId,
+      requestDate
+    );
+    return this.#currentThing
+      .readAllProperties()
+      .then((res) => {
+        responseDate = Date.now().toString();
+        // if (things[currentThing.id].key.hasKey) {
+        //   login.showKey("green");
+        // }
+        this.#logger.saveResponse(
+          "readAllProperties",
+          [res],
+          thingId,
+          requestDate,
+          responseDate,
+          true
+        );
+        return res;
+      })
+      .catch((error) => {
+        responseDate = Date.now().toString();
+        this.#logger.saveResponse(
+          "readAllProperties",
+          error,
+          thingId,
+          requestDate,
+          responseDate,
+          false
+        );
+        // if (err.toString().includes("Unauthorized")) {
+        //   login.showKey("red");
+        // }
+        console.log(error);
+        return error;
+      });
+  }
+  readMultipleProperties(properties) {
+    this.#currentProperty = ["readmultipleproperties"];
+    let requestDate = Date.now().toString();
+    let responseDate;
+    let thingId = this.currentThingID;
+    this.#logger.saveRequest(
+      "readMultipleProperties",
+      ["readmultipleproperties"],
+      thingId,
+      requestDate
+    );
+    console.log(properties);
+    return this.#currentThing
+      .readMultipleProperties(properties)
+      .then((res) => {
+        responseDate = Date.now().toString();
+        // if (things[currentThing.id].key.hasKey) {
+        //   login.showKey("green");
+        // }
+        this.#logger.saveResponse(
+          "readMultipleProperties",
+          [res],
+          thingId,
+          requestDate,
+          responseDate,
+          true
+        );
+        return res;
+      })
+      .catch((error) => {
+        responseDate = Date.now().toString();
+        this.#logger.saveResponse(
+          "readMultipleProperties",
+          error,
+          thingId,
+          requestDate,
+          responseDate,
+          false
+        );
+        // if (err.toString().includes("Unauthorized")) {
+        //   login.showKey("red");
+        // }
+        console.log(error);
+        return error;
+      });
+  }
   async readProperty(property, uriVariable) {
     this.#currentProperty = uriVariable ? [property, uriVariable] : [property];
     let payload = [property];
