@@ -75,3 +75,6 @@
     border: 2px solid map.get(colors.$theme-colors, "secondary");
   }
 }
+.btn-topLevel {
+  background-color: map.get(colors.$theme-colors, "secondary") !important;
+}

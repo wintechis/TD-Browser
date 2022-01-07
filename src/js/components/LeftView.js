@@ -153,10 +153,19 @@ class LeftView {
         typeof properties[property].uriVariables === "object" ? true : false;
       let observable = properties[property].observable;
       let readOnly = properties[property].readOnly;
+      let isTopLevelForm = [
+        "readallproperties",
+        "readmultipleproperties",
+        "writeallproperties",
+        "writemultipleproperties",
+      ].includes(property);
+
       let buttonElement = $.parseHTML(
         `<button id="${
           !hasUriVariables && "property--" + property
-        }" class="btn  list-group-item list-group-item-action  w-100 mb-1" type="button" data-bs-toggle="collapse" data-bs-target="#property--collapse--${property}" aria-expanded="false" aria-controls="property--collapse--${property}">
+        }" class="btn  list-group-item list-group-item-action  w-100 mb-1 ${
+          isTopLevelForm ? "btn-topLevel" : ""
+        }" type="button" data-bs-toggle="collapse" data-bs-target="#property--collapse--${property}" aria-expanded="false" aria-controls="property--collapse--${property}">
             ${property}
           </button>`
       );
