@@ -2,12 +2,14 @@
 import $ from "jquery";
 import JSONFormatter from "json-formatter-js";
 let observeIcon = (propertyName) =>
-  `<i id ="observeIcon--${propertyName}" class="bi-bullseye leftView--observeIcon"> </i>`;
+  `<i id ="observeIcon--${propertyName}" class="bi-eye-fill leftView--observeIcon"> </i>`;
 let observeIconActive = (propertyName) =>
-  `<i id ="observeIcon--${propertyName}" class="bi-bullseye leftView--observeIcon--active"> </i>`;
+  `<i id ="observeIcon--${propertyName}" class="bi-eye-fill leftView--observeIcon--active"> </i>`;
 
 let editIcon = (propertyName) =>
   `<i id ="editIcon--${propertyName}" class="leftView--editIcon bi-pencil-fill"> </i>`;
+let readableIcon = `<i class="bi-book-fill readableIcon"> </i>`;
+
 class LeftView {
   #tc;
   #mv;
@@ -88,10 +90,18 @@ class LeftView {
   }
   highlightButton(id) {
     if (id.includes("--")) {
+      let className = [
+        "readallproperties",
+        "readmultipleproperties",
+        "writeallproperties",
+        "writemultipleproperties",
+      ].includes(id.split("--")[1])
+        ? "btn-topLevel-active"
+        : "btn-active";
       $(`#${this.#previousSelectedButton.itemButton}`).removeClass(
-        "btn-active"
+        `btn-topLevel-active btn-active`
       );
-      $(`#${id}`).addClass("btn-active");
+      $(`#${id}`).addClass(className);
       this.#previousSelectedButton.itemButton = id;
     } else {
       $(`#${this.#previousSelectedButton.affordanceButton}`).removeClass(
@@ -153,6 +163,8 @@ class LeftView {
         typeof properties[property].uriVariables === "object" ? true : false;
       let observable = properties[property].observable;
       let readOnly = properties[property].readOnly;
+      let isPropertyReadable = this.#tc.isPropertyReadable(property);
+      let isPropertyWritable = this.#tc.isPropertyWritable(property);
       let isTopLevelForm = [
         "readallproperties",
         "readmultipleproperties",
@@ -169,7 +181,9 @@ class LeftView {
             ${property}
           </button>`
       );
-      !readOnly && $(buttonElement).append(editIcon(property));
+      isPropertyWritable && $(buttonElement).append(editIcon(property));
+      isPropertyReadable && $(buttonElement).append(readableIcon);
+
       observable &&
         $(buttonElement).append(
           this.#tc.isPropertyObserved(property)

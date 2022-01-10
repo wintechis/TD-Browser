@@ -10,6 +10,7 @@
     background-color: map.get(colors.$theme-colors, "primary");
     color: map.get(colors.$theme-colors, "tertiary");
   }
+
   .card {
     .btn {
       background-color: map.get(colors.$theme-colors, "primary");
@@ -25,19 +26,33 @@
       margin-bottom: 4px;
     }
   }
+  .btn-topLevel {
+    background-color: map.get(colors.$theme-colors, "secondary");
+  }
 
   .btn-active {
     background-color: map.get(colors.$theme-colors, "tertiary");
     color: map.get(colors.$theme-colors, "primary");
     border: 2px solid map.get(colors.$theme-colors, "primary");
   }
-  .bi-bullseye {
+  .btn-topLevel-active {
+    background-color: map.get(colors.$theme-colors, "tertiary");
+    color: map.get(colors.$theme-colors, "secondary");
+    border: 2px solid map.get(colors.$theme-colors, "secondary");
+  }
+
+  .bi-eye-fill {
     position: absolute;
     right: 0;
-    margin-right: 28px;
+    margin-right: 51px;
   }
 }
 .leftView--editIcon {
+  position: absolute;
+  right: 0;
+  margin-right: 28px;
+}
+.readableIcon {
   position: absolute;
   right: 0;
   margin-right: 5px;
@@ -74,7 +89,4 @@
     color: map.get(colors.$theme-colors, "secondary");
     border: 2px solid map.get(colors.$theme-colors, "secondary");
   }
-}
-.btn-topLevel {
-  background-color: map.get(colors.$theme-colors, "secondary") !important;
 }

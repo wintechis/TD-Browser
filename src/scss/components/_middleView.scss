@@ -13,7 +13,7 @@
       background-color: map.get(colors.$theme-colors, "tertiary");
       text-align: left;
     }
-    .bi-bullseye,
+    .bi-eye-fill,
     .bi-pencil-fill,
     .bi-info-circle-fill {
       color: map.get(colors.$theme-colors, "primary");
@@ -22,7 +22,7 @@
     .bi-info-circle-fill {
       color: map.get(colors.$theme-colors, "primary");
     }
-    .bi-bullseye {
+    .bi-eye-fill {
       border-radius: 50%;
       text-align: center;
       width: 24px;
@@ -32,7 +32,7 @@
       padding-right: 1px;
       margin-right: 2px;
     }
-    // .bi-bullseye:hover {
+    // .bi-eye-fill:hover {
     //   background-color: green;
     //   border-radius: 50%;
     //   color: white;
@@ -108,6 +108,25 @@
     button[type="submit"] {
       display: block;
     }
+    #middleView-readMultiplePropertiesForm {
+      label {
+        position: relative;
+        width: 100%;
+        padding-left: 30px;
+        margin-top: 10px;
+        cursor: pointer;
+      }
+      label:first-child {
+        margin-top: 30px;
+      }
+      input {
+        margin: 0;
+        position: absolute;
+        top: 0;
+        left: 0;
+        display: block;
+      }
+    }
   }
 }
 #middleView--refreshIcon {
@@ -150,7 +169,7 @@
     border: 2px solid map.get(colors.$theme-colors, "primary");
   }
 }
-#middleView-formSubmitButton {
+.mvFormSubmitBtn {
   margin: 20px auto 0 auto;
   display: block;
   color: map.get(colors.$theme-colors, "tertiary");

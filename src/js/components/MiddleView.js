@@ -1,8 +1,8 @@
 "use strict";
 import $ from "jquery";
 import JSONFormatter from "json-formatter-js";
-let observeIcon = `<i id="middleView--observeIcon" class="bi-bullseye"> </i>`;
-let observeIconActive = `<i id="middleView--observeIcon" class="bi-bullseye middleView--observeIcon--active"> </i>`;
+let observeIcon = `<i id="middleView--observeIcon" class="bi-eye-fill"> </i>`;
+let observeIconActive = `<i id="middleView--observeIcon" class="bi-eye-fill middleView--observeIcon--active"> </i>`;
 let refreshIcon = `<span id="middleView--refreshIcon"class="bi-arrow-clockwise"/>`;
 let editIcon = '<i id="middleView--editIcon" class="bi-pencil-fill"> </i>';
 let descriptionString = (id, description) =>
@@ -275,7 +275,7 @@ class MiddleView {
     }
     $(formElement).append(
       inputsContainer,
-      '<button type="submit" id="middleView-formSubmitButton" class="btn">Invoke</button'
+      '<button type="submit" id="middleView-formSubmitButton" class="btn mvFormSubmitBtn">Invoke</button'
     );
     return formElement;
   }
@@ -619,20 +619,21 @@ class MiddleView {
       $("#middleView-content").append(affordanceTitleContainer);
       let response = await this.#tc.readAllProperties();
       let formatter = $.parseHTML(`<div class="JsonFormatter"></div>`);
+      console.log(response);
       $(formatter).append(new JSONFormatter(response, 1).render());
       $("#middleView-content").append(formatter);
     } else if (property[0] === "readmultipleproperties") {
       $(affordanceTitleContainer).append(collapseSpan);
       let readableProperties = this.#tc.getReadableProperties();
-      let formElement = `<form id="middleView-readMultiplePropertiesForm" class="form-check">${readableProperties.reduce(
+      let formElement = `<form id="middleView-readMultiplePropertiesForm" class="form-check"><div class="middleView-inputsContainer">${readableProperties.reduce(
         (acc, curr) => {
           return (
             acc +
-            `<label class="form-check-label" for="flexCheckDefault">${curr} <input class="form-check-input" name="${curr}" type="checkbox" value=""></label>`
+            `<label class="form-check-label" >${curr} <input class="form-check-input" name="${curr}" type="checkbox" value=""></label>`
           );
         },
         ""
-      )}<button type="submit">Read</button></form>`;
+      )}</div><button class="btn mvFormSubmitBtn" type="submit">Read</button></form>`;
       $("#middleView-content").append(affordanceTitleContainer, formElement);
     } else if (property[0] === "writeallproperties") {
       $(affordanceTitleContainer).append(collapseSpan);
