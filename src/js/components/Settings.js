@@ -72,7 +72,7 @@ class Settings {
     let settings =
       JSON.parse(localStorage.getItem("settings")) || defaultSettings;
     let selectedElements =
-      ".card-request, .card-response-invokeAction, .card-response-readProperty, .card-response-writeProperty";
+      ".card-request, .card-response-invokeAction, .card-response-readProperty, .card-response-writeProperty, .card-response-readAllProperties, .card-response-readMultipleProperties, .card-response-writeAllProperties, .card-response-writeMultipleProperties";
     if (settings.logs === "onlyNotifications") {
       $(selectedElements).hide();
     } else {

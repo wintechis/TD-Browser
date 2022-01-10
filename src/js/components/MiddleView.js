@@ -275,7 +275,7 @@ class MiddleView {
     }
     $(formElement).append(
       inputsContainer,
-      '<button type="submit" id="middleView-formSubmitButton" class="btn mvFormSubmitBtn">Invoke</button'
+      '<button type="submit" id="middleView-formSubmitButton" class="btn btn-submit">Invoke</button'
     );
     return formElement;
   }
@@ -290,17 +290,6 @@ class MiddleView {
     required,
     unit
   ) {
-    console.log([
-      formElement,
-      type,
-      title,
-      description,
-      enumArray,
-      min,
-      max,
-      required,
-      unit,
-    ]);
     let div = $.parseHTML(
       `<div class="btn-group" role="group" aria-label="Basic radio toggle button group"></div>`
     );
@@ -482,39 +471,107 @@ class MiddleView {
   #appendUpdatePropertyForm(properties, isRequired) {
     let inputElements = "";
     let propertiesTD = this.#tc.getPropertiesTD();
+    let integerInput = (property, indx, isRequired) =>
+      `<label>${
+        property.includes("nestedProperty") ? property.split("--")[2] : property
+      } <input type="number" ${
+        isRequired ? "required" : ""
+      } name="${property}--integer" id="middleView-propertyForm-input-${indx}" step="1" /></label>`;
+    let numberInput = (property, indx, isRequired) =>
+      `<label>${
+        property.includes("nestedProperty") ? property.split("--")[2] : property
+      } <input type="number" ${
+        isRequired ? "required" : ""
+      } name="${property}--number"  id="middleView-propertyForm-input-${indx}" /></label>`;
+    let stringInput = (property, indx, isRequired) =>
+      `<label>$${
+        property.includes("nestedProperty") ? property.split("--")[2] : property
+      } <input type="text" ${
+        isRequired ? "required" : ""
+      } name="${property}--string"  id="middleView-propertyForm-input-${indx}" /> </label>`;
+    let booleanInput = (property, indx, isRequired) => ` <label>${
+      property.includes("nestedProperty") ? property.split("--")[2] : property
+    }<select class="form-select" ${
+      isRequired ? "required" : ""
+    } name="${property}--boolean" > 
+    <option selected>Select a Boolean Value/option>
+    <option value="true">True</option>
+    <option value="false">False</option>
+    </select></label>`;
+    let propertiesOfTypeObject = [];
     properties.forEach((property, indx) => {
       let propertyType = propertiesTD[property].type;
-      if (propertyType === "integer") {
-        inputElements += `<label>${property} <input type="number" ${
-          isRequired ? "required" : ""
-        } 
-        name="${property}--integer" id="middleView-propertyForm-input-${indx}" step="1" /></label>`;
-      } else if (propertyType === "number") {
-        inputElements += `<label>${property} <input type="number" ${
-          isRequired ? "required" : ""
-        } 
-        name="${property}--number"  id="middleView-propertyForm-input-${indx}" /></label>`;
-      } else if (propertyType === "boolean") {
-        inputElements += `
-        <label>${property}    <select class="form-select"  ${
-          isRequired ? "required" : ""
-        }
-         name="${property}--boolean" > 
-        <option selected>Select a Boolean Value/option>
-        <option value="true">True</option>
-        <option value="false">False</option>
-        </select></label>
-        `;
-      } else if (propertyType === "string") {
-        inputElements += `<label>${property} <input type="text" ${
-          isRequired ? "required" : ""
-        }  
-        name="${property}--string"  id="middleView-propertyForm-input-${indx}" /> </label>`;
+      switch (propertyType) {
+        case "integer":
+          inputElements += integerInput(property, indx, isRequired);
+          break;
+        case "number":
+          inputElements += numberInput(property, indx, isRequired);
+          break;
+        case "boolean":
+          inputElements += booleanInput(property, indx, isRequired);
+          break;
+        case "string":
+          inputElements += stringInput(property, indx, isRequired);
+          break;
+        case "object":
+          propertiesOfTypeObject.push(property);
+          break;
+        default:
+          break;
       }
     });
-    let formElement = $.parseHTML("<form id='middleView-propertyForm'></form>");
-    let submitButtonElement = `<button class="btn" type="submit">Update</button>`;
-    $(formElement).append(inputElements, submitButtonElement);
+    propertiesOfTypeObject.forEach((property) => {
+      let nestedInputElements = `<div class="nestedInputsContainer"  id="middleView-propertyForm-nestedInputsContainer-${property}"> <div class="header ">${property}</div>`;
+      Object.keys(propertiesTD[property]["properties"]).forEach(
+        (nestedProperty, indx) => {
+          let propertyType =
+            propertiesTD[property]["properties"][nestedProperty].type;
+          switch (propertyType) {
+            case "integer":
+              nestedInputElements += integerInput(
+                "nestedProperty--" + property + "--" + nestedProperty,
+                "nestedProperty--" + indx,
+                isRequired
+              );
+              break;
+            case "number":
+              nestedInputElements += numberInput(
+                "nestedProperty--" + property + "--" + nestedProperty,
+                "nested-property-" + indx,
+                isRequired
+              );
+              break;
+            case "boolean":
+              nestedInputElements += booleanInput(
+                "nestedProperty--" + property + "--" + nestedProperty,
+                "nested-property-" + indx,
+                isRequired
+              );
+              break;
+            case "string":
+              nestedInputElements += stringInput(
+                "nestedProperty--" + property + "--" + nestedProperty,
+                "nested-property-" + indx,
+                isRequired
+              );
+              break;
+            default:
+              break;
+          }
+        }
+      );
+      nestedInputElements += ` </div>`;
+      inputElements += nestedInputElements;
+    });
+    let formElement = $.parseHTML(`<form id="middleView-propertyForm"></form>`);
+    let inputsContainer = $.parseHTML(
+      `<div class="middleView-inputsContainer"></div>`
+    );
+    let submitButtonElement = `<button class="btn btn-submit" type="submit">Update</button>`;
+    $(inputsContainer).append(inputElements);
+    $(formElement).append(inputsContainer, submitButtonElement);
+
     $("#middleView-content > .json-formatter-row").remove();
     $("#middleView-content").append(formElement);
   }
@@ -522,9 +579,19 @@ class MiddleView {
     let inputs = $("#middleView-propertyForm")
       .serializeArray()
       .reduce((acc, input) => {
-        let type = input.name.split("--")[1];
-        let key = input.name.split("--")[0];
+        let type;
+        let key;
+        let upperKey;
+        if (input.name.includes("nestedProperty")) {
+          type = input.name.split("--")[3];
+          key = input.name.split("--")[2];
+          upperKey = input.name.split("--")[1];
+        } else {
+          type = input.name.split("--")[1];
+          key = input.name.split("--")[0];
+        }
         let value;
+        if (input.value.length === 0) return { ...acc };
         switch (type) {
           case "number":
             value = +input.value;
@@ -532,14 +599,25 @@ class MiddleView {
           case "integer":
             value = Math.floor(+input.value);
             break;
+          case "number":
+            value = +input.value;
+            break;
           case "boolean":
             value = input.value === "true";
             break;
-          default:
-            value = input.value;
-            break;
         }
-        return value.length === 0 ? { ...acc } : { ...acc, [key]: value };
+        if (input.name.includes("nestedProperty")) {
+          if (value.length !== 0) {
+            if (acc.hasOwnProperty(upperKey)) acc[upperKey][key] = value;
+            else {
+              acc[upperKey] = {};
+              acc[upperKey][key] = value;
+            }
+          }
+          return { ...acc };
+        } else {
+          return { ...acc, [key]: value };
+        }
       }, {});
     let response;
     switch (this.#currentProperty[0]) {
@@ -619,7 +697,6 @@ class MiddleView {
       $("#middleView-content").append(affordanceTitleContainer);
       let response = await this.#tc.readAllProperties();
       let formatter = $.parseHTML(`<div class="JsonFormatter"></div>`);
-      console.log(response);
       $(formatter).append(new JSONFormatter(response, 1).render());
       $("#middleView-content").append(formatter);
     } else if (property[0] === "readmultipleproperties") {
@@ -633,7 +710,7 @@ class MiddleView {
           );
         },
         ""
-      )}</div><button class="btn mvFormSubmitBtn" type="submit">Read</button></form>`;
+      )}</div><button class="btn btn-submit " type="submit">Read</button></form>`;
       $("#middleView-content").append(affordanceTitleContainer, formElement);
     } else if (property[0] === "writeallproperties") {
       $(affordanceTitleContainer).append(collapseSpan);

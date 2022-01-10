@@ -7,13 +7,21 @@
     color: map.get(colors.$theme-colors, "secondary");
   }
   #middleView-content {
+    .btn-submit {
+      display: block;
+      background-color: map.get(colors.$theme-colors, "secondary");
+      color: map.get(colors.$theme-colors, "tertiary");
+      width: 80px;
+      height: 40px;
+      margin: 10px auto 0px auto;
+    }
     display: grid;
     grid-template-rows: max-content auto;
     .card {
       background-color: map.get(colors.$theme-colors, "tertiary");
       text-align: left;
     }
-    .bi-eye-fill,
+    .bi-bullseye,
     .bi-pencil-fill,
     .bi-info-circle-fill {
       color: map.get(colors.$theme-colors, "primary");
@@ -22,7 +30,7 @@
     .bi-info-circle-fill {
       color: map.get(colors.$theme-colors, "primary");
     }
-    .bi-eye-fill {
+    .bi-bullseye {
       border-radius: 50%;
       text-align: center;
       width: 24px;
@@ -32,7 +40,7 @@
       padding-right: 1px;
       margin-right: 2px;
     }
-    // .bi-eye-fill:hover {
+    // .bi-bullseye:hover {
     //   background-color: green;
     //   border-radius: 50%;
     //   color: white;
@@ -69,10 +77,30 @@
         height: 100%;
         overflow: auto;
       }
+
+      .nestedInputsContainer {
+        border: 2px solid map.get(colors.$theme-colors, "primary");
+        position: relative;
+        margin-top: 20px;
+        padding: 0 10px 5px 10px;
+        .header {
+          position: absolute;
+          top: -12px;
+          left: 25%;
+          padding: 3px;
+          background-color: map.get(colors.$theme-colors, "primary");
+          display: block;
+          width: 50%;
+          text-align: center;
+          margin: 0 auto 5px auto;
+          color: white;
+        }
+      }
       input,
       select {
-        margin: 15px 0;
+        margin: 5px auto;
         border: 2px solid map.get(colors.$theme-colors, "primary");
+        display: block;
       }
       .btn-group {
         margin: 15px 0;
@@ -104,9 +132,6 @@
     #middleView-propertyForm-input {
       display: block;
       margin: 40px auto 20px;
-    }
-    button[type="submit"] {
-      display: block;
     }
     #middleView-readMultiplePropertiesForm {
       label {
@@ -157,23 +182,19 @@
   // }
 }
 #middleView-propertyForm {
-  button[type="submit"] {
-    background-color: map.get(colors.$theme-colors, "secondary");
-    color: map.get(colors.$theme-colors, "tertiary");
-    width: 80px;
-    height: 40px;
-    margin: auto;
+  label {
+    position: relative;
+    width: 100%;
+    margin-top: 10px;
+    cursor: pointer;
+  }
+  label:first-child {
+    margin-top: 20px;
   }
   input,
   select {
     border: 2px solid map.get(colors.$theme-colors, "primary");
   }
-}
-.mvFormSubmitBtn {
-  margin: 20px auto 0 auto;
-  display: block;
-  color: map.get(colors.$theme-colors, "tertiary");
-  background-color: map.get(colors.$theme-colors, "secondary");
 }
 #middleView--subscribeEvent,
 #middleView--unsubscribeEvent {

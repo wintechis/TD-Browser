@@ -139,8 +139,6 @@ class ThingsController {
       isReadable =
         !propertyTD.hasOwnProperty("writeOnly") || !propertyTD.writeOnly;
     }
-    console.log("isPropertyReadable ", property, isReadable);
-
     return isReadable;
   }
   isPropertyWritable(property) {
@@ -156,8 +154,6 @@ class ThingsController {
       isWritable =
         !propertyTD.hasOwnProperty("readOnly") || !propertyTD.readOnly;
     }
-    console.log("isPropertyWritable ", property, isWritable);
-
     return isWritable;
   }
 
@@ -228,42 +224,48 @@ class ThingsController {
     }
   }
   async writeAllProperties(properties) {
-    console.log(properties);
     const requestDate = Date.now().toString();
     const thingId = this.currentThingID;
-    const thing = this.#currentThing;
+    const form = this.#getTopLevelForm("writeallproperties");
     this.#logger.saveRequest(
       "writeAllProperties",
-      [properties],
+      properties,
       thingId,
       requestDate
     );
-    thing
-      .writeAllProperties(properties)
-      .then((response) => {
+    let config = {
+      method: form.httpMethod.toLowerCase(),
+      url: form.url,
+      headers: {
+        "Content-Type": form.contentType,
+      },
+      data: properties,
+    };
+    return await axios(config)
+      .then((res) => {
         const responseDate = Date.now().toString();
         this.#logger.saveResponse(
           "writeAllProperties",
-          [response],
+          ["Promise Resolved"],
           thingId,
           requestDate,
           responseDate,
           true
         );
 
-        return { status: true, data: response };
+        return { status: true, data: "Promise Resolved" };
       })
-      .catch((error) => {
+      .catch((e) => {
         const responseDate = Date.now().toString();
         this.#logger.saveResponse(
           "writeAllProperties",
-          [error],
+          [e.toString()],
           thingId,
           requestDate,
           responseDate,
           false
         );
-        return { status: false, data: error };
+        return { status: false, data: e.toString() };
       });
     // let url =
     //   propertyForm.href.split("{?id}")[0] +
@@ -305,42 +307,47 @@ class ThingsController {
     //   });
   }
   async writeMultipleProperties(properties) {
-    console.log(properties);
     const requestDate = Date.now().toString();
     const thingId = this.currentThingID;
-    const thing = this.#currentThing;
+    const form = this.#getTopLevelForm("writemultipleproperties");
     this.#logger.saveRequest(
       "writeMultipleProperties",
-      [properties],
+      properties,
       thingId,
       requestDate
     );
-    thing
-      .writeMultipleProperties(properties)
-      .then((response) => {
+    let config = {
+      method: form.httpMethod.toLowerCase(),
+      url: form.url,
+      headers: {
+        "Content-Type": form.contentType,
+      },
+      data: properties,
+    };
+    return await axios(config)
+      .then((res) => {
         const responseDate = Date.now().toString();
         this.#logger.saveResponse(
           "writeMultipleProperties",
-          [response],
+          ["Promise Resolved"],
           thingId,
           requestDate,
           responseDate,
           true
         );
-
-        return { status: true, data: response };
+        return { status: true, data: "Promise Resolved" };
       })
-      .catch((error) => {
+      .catch((e) => {
         const responseDate = Date.now().toString();
         this.#logger.saveResponse(
           "writeMultipleProperties",
-          [error],
+          [e.toString()],
           thingId,
           requestDate,
           responseDate,
           false
         );
-        return { status: false, data: error };
+        return { status: false, data: e.toString() };
       });
   }
   async writeProperty(value) {
@@ -408,8 +415,8 @@ class ThingsController {
     return this.getEventTD(property).description;
   }
   getReadableProperties() {
-    return Object.keys(this.getPropertiesTD()).filter(
-      (property) => this.isPropertyReadable
+    return Object.keys(this.getPropertiesTD()).filter((property) =>
+      this.isPropertyReadable(property)
     );
   }
   getWritableProperties() {
@@ -454,26 +461,26 @@ class ThingsController {
     return await axios(config)
       .then((res) => {
         responseDate = Date.now().toString();
-        // this.#logger.saveResponse(
-        //   "readAllProperties",
-        //   [res.data],
-        //   thingId,
-        //   requestDate,
-        //   responseDate,
-        //   true
-        // );
+        this.#logger.saveResponse(
+          "readAllProperties",
+          [res.data],
+          thingId,
+          requestDate,
+          responseDate,
+          true
+        );
         return res.data;
       })
       .catch((e) => {
         responseDate = Date.now().toString();
-        // this.#logger.saveResponse(
-        //   "readAllProperties",
-        //   e.toString(),
-        //   thingId,
-        //   requestDate,
-        //   responseDate,
-        //   false
-        // );
+        this.#logger.saveResponse(
+          "readAllProperties",
+          e.toString(),
+          thingId,
+          requestDate,
+          responseDate,
+          false
+        );
         return e.toString();
       });
   }
@@ -482,8 +489,13 @@ class ThingsController {
     let requestDate = Date.now().toString();
     let responseDate;
     let thingId = this.currentThingID;
+    this.#logger.saveRequest(
+      "readMultipleProperties",
+      propertyNames,
+      thingId,
+      requestDate
+    );
     let form = this.#getTopLevelForm("readmultipleproperties");
-    console.log(form.httpMethod.toLowerCase());
     let config = {
       method: form.httpMethod.toLowerCase(),
       url: form.url,
@@ -492,35 +504,29 @@ class ThingsController {
       },
       data: propertyNames,
     };
-    this.#logger.saveRequest(
-      "readMultipleProperties",
-      ["readmultipleproperties"],
-      thingId,
-      requestDate
-    );
     return await axios(config)
       .then((res) => {
         responseDate = Date.now().toString();
-        // this.#logger.saveResponse(
-        //   "readMultipleProperties",
-        //   [res.data],
-        //   thingId,
-        //   requestDate,
-        //   responseDate,
-        //   true
-        // );
+        this.#logger.saveResponse(
+          "readMultipleProperties",
+          [res.data],
+          thingId,
+          requestDate,
+          responseDate,
+          true
+        );
         return res.data;
       })
-      .catch((error) => {
+      .catch((e) => {
         responseDate = Date.now().toString();
-        // this.#logger.saveResponse(
-        //   "readMultipleProperties",
-        //   e.toString(),
-        //   thingId,
-        //   requestDate,
-        //   responseDate,
-        //   false
-        // );
+        this.#logger.saveResponse(
+          "readMultipleProperties",
+          e.toString(),
+          thingId,
+          requestDate,
+          responseDate,
+          false
+        );
         console.log(e.toString());
         return e.toString();
       });
