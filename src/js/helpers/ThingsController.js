@@ -127,12 +127,38 @@ class ThingsController {
   }
 
   isPropertyReadable(property) {
-    let propertyTD = this.getPropertyTD(property);
-    return !propertyTD.hasOwnProperty("writeOnly") || !propertyTD.writeOnly;
+    let isReadable;
+    if (["writeallproperties", "writemultipleproperties"].includes(property)) {
+      isReadable = false;
+    } else if (
+      ["readallproperties", "readmultipleproperties"].includes(property)
+    ) {
+      isReadable = true;
+    } else {
+      let propertyTD = this.getPropertyTD(property);
+      isReadable =
+        !propertyTD.hasOwnProperty("writeOnly") || !propertyTD.writeOnly;
+    }
+    console.log("isPropertyReadable ", property, isReadable);
+
+    return isReadable;
   }
   isPropertyWritable(property) {
-    let propertyTD = this.getPropertyTD(property);
-    return !propertyTD.hasOwnProperty("readOnly") || !propertyTD.readOnly;
+    let isWritable;
+    if (["writeallproperties", "writemultipleproperties"].includes(property)) {
+      isWritable = true;
+    } else if (
+      ["readallproperties", "readmultipleproperties"].includes(property)
+    ) {
+      isWritable = false;
+    } else {
+      let propertyTD = this.getPropertyTD(property);
+      isWritable =
+        !propertyTD.hasOwnProperty("readOnly") || !propertyTD.readOnly;
+    }
+    console.log("isPropertyWritable ", property, isWritable);
+
+    return isWritable;
   }
 
   getPropertyTD(property) {
@@ -141,9 +167,13 @@ class ThingsController {
   }
   getToplevelForms() {
     if (!this.hasCurrentThing) return null;
-    return this.#getTD()["forms"].reduce((acc, curr) => {
-      return { [curr.op]: {}, ...acc };
-    }, {});
+    let td = this.#getTD();
+
+    return td.hasOwnProperty("forms")
+      ? td["forms"].reduce((acc, curr) => {
+          return { [curr.op]: {}, ...acc };
+        }, {})
+      : [];
   }
   getEventTD(event) {
     if (!this.hasCurrentThing) return null;
@@ -387,96 +417,112 @@ class ThingsController {
       this.isPropertyWritable(property)
     );
   }
-
-  readAllProperties() {
+  #getTopLevelForm(method) {
+    let thing = this.#currentThing;
+    let base = thing.base || "";
+    let forms = thing.forms;
+    for (let i in forms) {
+      if (forms[i].op === method) {
+        return {
+          url: base + forms[i].href,
+          httpMethod: forms[i]["htv:methodName"],
+          contentType: forms[i].contentType,
+        };
+      }
+    }
+    throw new Error("notSupported");
+  }
+  async readAllProperties() {
     this.#currentProperty = ["readallproperties"];
     let requestDate = Date.now().toString();
     let responseDate;
     let thingId = this.currentThingID;
+    let form = this.#getTopLevelForm("readallproperties");
     this.#logger.saveRequest(
       "readAllProperties",
       ["readallproperties"],
       thingId,
       requestDate
     );
-    return this.#currentThing
-      .readAllProperties()
+    let config = {
+      method: form.httpMethod.toLowerCase(),
+      url: form.url,
+      headers: {
+        "Content-Type": form.contentType,
+      },
+    };
+    return await axios(config)
       .then((res) => {
         responseDate = Date.now().toString();
-        // if (things[currentThing.id].key.hasKey) {
-        //   login.showKey("green");
-        // }
-        this.#logger.saveResponse(
-          "readAllProperties",
-          [res],
-          thingId,
-          requestDate,
-          responseDate,
-          true
-        );
-        return res;
+        // this.#logger.saveResponse(
+        //   "readAllProperties",
+        //   [res.data],
+        //   thingId,
+        //   requestDate,
+        //   responseDate,
+        //   true
+        // );
+        return res.data;
       })
-      .catch((error) => {
+      .catch((e) => {
         responseDate = Date.now().toString();
-        this.#logger.saveResponse(
-          "readAllProperties",
-          error,
-          thingId,
-          requestDate,
-          responseDate,
-          false
-        );
-        // if (err.toString().includes("Unauthorized")) {
-        //   login.showKey("red");
-        // }
-        console.log(error);
-        return error;
+        // this.#logger.saveResponse(
+        //   "readAllProperties",
+        //   e.toString(),
+        //   thingId,
+        //   requestDate,
+        //   responseDate,
+        //   false
+        // );
+        return e.toString();
       });
   }
-  readMultipleProperties(properties) {
+  async readMultipleProperties(propertyNames) {
     this.#currentProperty = ["readmultipleproperties"];
     let requestDate = Date.now().toString();
     let responseDate;
     let thingId = this.currentThingID;
+    let form = this.#getTopLevelForm("readmultipleproperties");
+    console.log(form.httpMethod.toLowerCase());
+    let config = {
+      method: form.httpMethod.toLowerCase(),
+      url: form.url,
+      headers: {
+        "Content-Type": form.contentType,
+      },
+      data: propertyNames,
+    };
     this.#logger.saveRequest(
       "readMultipleProperties",
       ["readmultipleproperties"],
       thingId,
       requestDate
     );
-    console.log(properties);
-    return this.#currentThing
-      .readMultipleProperties(properties)
+    return await axios(config)
       .then((res) => {
         responseDate = Date.now().toString();
-        // if (things[currentThing.id].key.hasKey) {
-        //   login.showKey("green");
-        // }
-        this.#logger.saveResponse(
-          "readMultipleProperties",
-          [res],
-          thingId,
-          requestDate,
-          responseDate,
-          true
-        );
-        return res;
+        // this.#logger.saveResponse(
+        //   "readMultipleProperties",
+        //   [res.data],
+        //   thingId,
+        //   requestDate,
+        //   responseDate,
+        //   true
+        // );
+        return res.data;
       })
       .catch((error) => {
         responseDate = Date.now().toString();
-        this.#logger.saveResponse(
-          "readMultipleProperties",
-          error,
-          thingId,
-          requestDate,
-          responseDate,
-          false
-        );
-        // if (err.toString().includes("Unauthorized")) {
-        //   login.showKey("red");
-        // }
-        console.log(error);
-        return error;
+        // this.#logger.saveResponse(
+        //   "readMultipleProperties",
+        //   e.toString(),
+        //   thingId,
+        //   requestDate,
+        //   responseDate,
+        //   false
+        // );
+        console.log(e.toString());
+        return e.toString();
       });
   }
   async readProperty(property, uriVariable) {
