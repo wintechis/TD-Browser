@@ -47,6 +47,7 @@ class RightView {
     if (
       [
         "readProperty",
+        "readAllProperties",
         "observeProperty",
         "unobserveProperty",
         "subscribeEvent",
@@ -73,6 +74,15 @@ class RightView {
         headerText = request.data[1]
           ? request.data[0] + " : " + request.data[1]
           : request.data[0];
+      } else if (
+        [
+          "readAllProperties",
+          "readMultipleProperties",
+          "writeAllProperties",
+          "writeMultipleProperties",
+        ].includes(request.type)
+      ) {
+        headerText = undefined;
       } else {
         headerText = request.data.join(" : ");
       }
@@ -87,7 +97,9 @@ class RightView {
           request.date
         }">${title} <span class="bi-caret-right-fill"/> <span class="badge bg-secondary">${
           request.type
-        }</span> <span class="bi-caret-right-fill"/> ${headerText}</div>`
+        }</span> ${
+          headerText ? `<span class="bi-caret-right-fill"/>` + headerText : ""
+        }</div>`
       );
     };
     const cardBody = $.parseHTML(
@@ -132,6 +144,15 @@ class RightView {
         headerText = request.data[1]
           ? request.data[0] + " : " + request.data[1]
           : request.data[0];
+      } else if (
+        [
+          "readAllProperties",
+          "readMultipleProperties",
+          "writeAllProperties",
+          "writeMultipleProperties",
+        ].includes(request.type)
+      ) {
+        headerText = undefined;
       } else {
         headerText = request.data.join(" : ");
       }
@@ -146,8 +167,9 @@ class RightView {
         ${title} <span class="bi-caret-right-fill"/> <span class="badge bg-secondary">${
           request.type
         }</span>
-           <span class="bi-caret-right-fill"/> ${headerText}
-        </div>`
+          ${
+            headerText ? `<span class="bi-caret-right-fill"/>` + headerText : ""
+          }</div>`
       );
     };
     const cardBody = $.parseHTML(

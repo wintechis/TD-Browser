@@ -2,12 +2,14 @@
 import $ from "jquery";
 import JSONFormatter from "json-formatter-js";
 let observeIcon = (propertyName) =>
-  `<i id ="observeIcon--${propertyName}" class="bi-bullseye leftView--observeIcon"> </i>`;
+  `<i id ="observeIcon--${propertyName}" class="bi-eye-fill leftView--observeIcon"> </i>`;
 let observeIconActive = (propertyName) =>
-  `<i id ="observeIcon--${propertyName}" class="bi-bullseye leftView--observeIcon--active"> </i>`;
+  `<i id ="observeIcon--${propertyName}" class="bi-eye-fill leftView--observeIcon--active"> </i>`;
 
 let editIcon = (propertyName) =>
   `<i id ="editIcon--${propertyName}" class="leftView--editIcon bi-pencil-fill"> </i>`;
+let readableIcon = `<i class="bi-book-fill readableIcon"> </i>`;
+
 class LeftView {
   #tc;
   #mv;
@@ -69,7 +71,7 @@ class LeftView {
           break;
         case "property":
           this.highlightButton(elementID);
-          this.#mv.appendPropertyResponse(elementID.split("--").splice(1, 2));
+          this.#mv.appendProperty(elementID.split("--").splice(1, 2));
           break;
         case "event":
           this.highlightButton(elementID);
@@ -88,10 +90,18 @@ class LeftView {
   }
   highlightButton(id) {
     if (id.includes("--")) {
+      let className = [
+        "readallproperties",
+        "readmultipleproperties",
+        "writeallproperties",
+        "writemultipleproperties",
+      ].includes(id.split("--")[1])
+        ? "btn-topLevel-active"
+        : "btn-active";
       $(`#${this.#previousSelectedButton.itemButton}`).removeClass(
-        "btn-active"
+        `btn-topLevel-active btn-active`
       );
-      $(`#${id}`).addClass("btn-active");
+      $(`#${id}`).addClass(className);
       this.#previousSelectedButton.itemButton = id;
     } else {
       $(`#${this.#previousSelectedButton.affordanceButton}`).removeClass(
@@ -143,21 +153,37 @@ class LeftView {
   }
   #appendProperties() {
     this.#resetAffordance();
-    let properties = this.#tc.getPropertiesTD();
+    let properties = {
+      ...this.#tc.getToplevelForms(),
+      ...this.#tc.getPropertiesTD(),
+    };
     let listGroupElement = $.parseHTML(`<div class="list-group"></div>`);
     Object.keys(properties).forEach((property) => {
       let hasUriVariables =
         typeof properties[property].uriVariables === "object" ? true : false;
       let observable = properties[property].observable;
       let readOnly = properties[property].readOnly;
+      let isPropertyReadable = this.#tc.isPropertyReadable(property);
+      let isPropertyWritable = this.#tc.isPropertyWritable(property);
+      let isTopLevelForm = [
+        "readallproperties",
+        "readmultipleproperties",
+        "writeallproperties",
+        "writemultipleproperties",
+      ].includes(property);
+
       let buttonElement = $.parseHTML(
         `<button id="${
           !hasUriVariables && "property--" + property
-        }" class="btn  list-group-item list-group-item-action  w-100 mb-1" type="button" data-bs-toggle="collapse" data-bs-target="#property--collapse--${property}" aria-expanded="false" aria-controls="property--collapse--${property}">
+        }" class="btn  list-group-item list-group-item-action  w-100 mb-1 ${
+          isTopLevelForm ? "btn-topLevel" : ""
+        }" type="button" data-bs-toggle="collapse" data-bs-target="#property--collapse--${property}" aria-expanded="false" aria-controls="property--collapse--${property}">
             ${property}
           </button>`
       );
-      !readOnly && $(buttonElement).append(editIcon(property));
+      isPropertyWritable && $(buttonElement).append(editIcon(property));
+      isPropertyReadable && $(buttonElement).append(readableIcon);
+
       observable &&
         $(buttonElement).append(
           this.#tc.isPropertyObserved(property)

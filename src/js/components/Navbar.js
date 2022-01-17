@@ -4,6 +4,10 @@ import helpers, { isURL } from "../helpers";
 import axios from "axios";
 import Settings from "./Settings";
 const spinnerElement = `<span class="spinner-border  spinner-border-sm" id="consumingSpinner" > </span>`;
+let alertElement = (text, type, id) => {
+  return `
+  <div id="${id}" class="alert alert-${type} position-fixed top-0 start-0 p-3 w-100" style="z-index: 11" role="alert">${text}</div>`;
+};
 class Navbar {
   #LV;
   #tc;
@@ -109,8 +113,14 @@ class Navbar {
           await this.#tc.consume(td);
           key = !key;
         })
-        .catch((e) => {
-          console.log(e);
+        .catch((error) => {
+          let alertId = "alert-" + Date.now();
+          $("body")
+            .append(alertElement(`Failed to Consume`, "danger", alertId))
+            .show("slow");
+          setTimeout(() => {
+            $("#" + alertId).remove();
+          }, 2000);
         });
     }
     $("#consumeButton").html("Consume");
@@ -126,7 +136,21 @@ class Navbar {
       this.#LV.highlightButton("affordanceMetadata");
       this.#MV.clearMiddleViewContent();
       this.#MV.addMiddleViewTitle(this.#tc.currentThingTitle);
+      let alertId = "alert-" + Date.now();
+      $("body")
+        .append(
+          alertElement(
+            `Successfully Consumed ${this.#tc.currentThingTitle}`,
+            "success",
+            alertId
+          )
+        )
+        .show("slow");
+      setTimeout(() => {
+        $("#" + alertId).remove();
+      }, 2000);
     }
+
     $("#consumingForm").trigger("reset");
   }
   #thingAvatarGenerator(title, id) {
