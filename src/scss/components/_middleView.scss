@@ -172,7 +172,7 @@
         cursor: pointer;
       }
       label:first-child {
-        margin-top: 30px;
+        margin-top: 25px;
       }
       input {
         margin: 0;
@@ -180,6 +180,18 @@
         top: 0;
         left: 0;
         display: block;
+      }
+      .selectAll {
+        &-label {
+          text-align: right;
+        }
+        &-input {
+          display: inline;
+          position: relative;
+          display: inline-block;
+          float: none;
+          margin-right: 10px;
+        }
       }
     }
   }
