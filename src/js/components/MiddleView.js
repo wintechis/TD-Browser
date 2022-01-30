@@ -166,7 +166,7 @@ class MiddleView {
       } else if (this.#currentAction.types.undefined === "boolean") {
         inputs = [{ name: undefined, value: inputs[0].value === "true" }];
       } else {
-        inputs = [{ name: undefined, value: inputs[0].value }];
+        inputs = [{ name: inputs[0].name, value: inputs[0].value }];
       }
     }
     let inputsObject = inputs.reduce((accumulator, current) => {
@@ -702,7 +702,6 @@ class MiddleView {
     arrayValidator();
   }
   async #submitProperty() {
-    console.log((inputs = $("#middleView-propertyForm").serializeArray()));
     let inputs = $("#middleView-propertyForm")
       .serializeArray()
       .reduce((acc, input) => {
@@ -843,7 +842,7 @@ class MiddleView {
     } else if (property[0] === "readmultipleproperties") {
       $(affordanceTitleContainer).append(collapseSpan);
       let readableProperties = this.#tc.getReadableProperties();
-      let formElement = `<form id="middleView-readMultiplePropertiesForm" class="form-check"><div class="middleView-inputsContainer">${readableProperties.reduce(
+      let formElement = `<form id="middleView-readMultiplePropertiesForm" class="form-check"><div class="middleView-inputsContainer"> <label class="form-check-label selectAll-label"><input class="form-check-input selectAll-input" type="checkbox" value="false"> <span>Select All</span></label> ${readableProperties.reduce(
         (acc, curr) => {
           return (
             acc +
@@ -853,6 +852,19 @@ class MiddleView {
         ""
       )}</div><button class="btn btn-submit " type="submit">Read</button></form>`;
       $("#middleView-content").append(affordanceTitleContainer, formElement);
+      let selectAllElement = $("#middleView-readMultiplePropertiesForm ").find(
+        ".selectAll-input"
+      );
+      console.log(selectAllElement);
+      $(selectAllElement).on("change", () => {
+        if (selectAllElement.is(":checked")) {
+          $($(".form-check-input")).prop("checked", true).trigger("change");
+          $(selectAllElement).attr("value", "true");
+        } else {
+          $($(".form-check-input")).prop("checked", false).trigger("change");
+          $(selectAllElement).attr("value", "false");
+        }
+      });
     } else if (property[0] === "writeallproperties") {
       $(affordanceTitleContainer).append(collapseSpan);
       $("#middleView-content").append(affordanceTitleContainer);
