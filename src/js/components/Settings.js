@@ -51,11 +51,11 @@ class Settings {
             defaultSettings.theme === "dark" ? "selected" : ""
           }  value="dark">Dark</option>
         </select>
-        <label class="form-text-label" for="settings-arraySeparator">Array Separator</label>
-        <input type="text" id="settings-arraySeparator" value="${
-          defaultSettings.arraySeparator
-        }" class=""/>
   </div>`;
+    /*   <label class="form-text-label" for="settings-arraySeparator">Array Separator</label>
+  <input type="text" id="settings-arraySeparator" value="${
+    defaultSettings.arraySeparator
+  }" class=""/> */
   }
   appendSettingsForm() {
     $("#settingsForm").remove();
