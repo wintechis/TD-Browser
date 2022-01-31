@@ -5,6 +5,9 @@ class Settings {
   get htmlElement() {
     return this.#htmlElement();
   }
+  get getArraySeparator() {
+    return JSON.parse(localStorage.getItem("settings")).arraySeparator;
+  }
   generateSettingsForm() {
     let defaultSettings = JSON.parse(localStorage.getItem("settings"));
     if (defaultSettings === null) {
@@ -12,6 +15,7 @@ class Settings {
         notificationSound: true,
         logs: "onlyNotifications",
         theme: "default",
+        arraySeparator: ",",
       };
       localStorage.setItem("settings", JSON.stringify(defaultSettings));
     }
@@ -48,16 +52,21 @@ class Settings {
           }  value="dark">Dark</option>
         </select>
   </div>`;
+    /*   <label class="form-text-label" for="settings-arraySeparator">Array Separator</label>
+  <input type="text" id="settings-arraySeparator" value="${
+    defaultSettings.arraySeparator
+  }" class=""/> */
   }
   appendSettingsForm() {
     $("#settingsForm").remove();
     $("#settings-form-container").append(this.generateSettingsForm());
   }
   saveSettings() {
-    let settings = {
+    const settings = {
       notificationSound: $("#notificationSound").is(":checked"),
       logs: $("#settings-logs").val(),
       theme: $("#settings-theme").val(),
+      arraySeparator: $("#settings-arraySeparator").val(),
     };
     localStorage.setItem("settings", JSON.stringify({ ...settings }));
     this.appendSettingsForm();
