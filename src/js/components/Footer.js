@@ -1,1 +1,1 @@
-export default `<div id="footer">&#169 2021 FAU </div>`;
+export default `<div id="footer">&#169 2022 FAU </div>`;
