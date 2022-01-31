@@ -495,7 +495,7 @@ class MiddleView {
     let integerInput = (property, indx, isRequired, unit, min, max) =>
       `<label><span>${
         property.includes("nestedProperty") ? property.split("--")[2] : property
-      }</span><input type="number" ${
+      }</span><input type="number" placeholder="Enter a Value of Type Integer" ${
         isRequired ? "required" : ""
       } name="${property}--integer" id="middleView-propertyForm-input-${indx}" step="1" data-bs-toggle="tooltip" data-bs-placement="top" title="${tooltip(
         "Integer",
@@ -506,7 +506,7 @@ class MiddleView {
     let numberInput = (property, indx, isRequired, unit, min, max) =>
       `<label><span>${
         property.includes("nestedProperty") ? property.split("--")[2] : property
-      }</span> <input type="number" ${
+      }</span> <input placeholder="Enter a Value of Type Number" type="number" ${
         isRequired ? "required" : ""
       } name="${property}--number"  id="middleView-propertyForm-input-${indx}" data-bs-toggle="tooltip" data-bs-placement="top" title="${tooltip(
         "Number",
@@ -534,7 +534,7 @@ class MiddleView {
           property.includes("nestedProperty")
             ? property.split("--")[2]
             : property
-        }</span> <input type="text" ${
+        }</span> <input type="text" placeholder="Enter a Value of Type String" ${
           isRequired ? "required" : ""
         } name="${property}--string"  id="middleView-propertyForm-input-${indx}" data-bs-toggle="tooltip" data-bs-placement="top" title="${tooltip(
           "String"
@@ -545,7 +545,7 @@ class MiddleView {
       `<label><span>${
         property.includes("nestedProperty") ? property.split("--")[2] : property
       }</span> <div class="textareaType-invalid" data-toggle="tooltip" data-placement="top" style="display:none;"></div> <textarea
-      class="textarea-type-array" ${
+      class="textarea-type-array" placeholder="Enter a Value of Type Array" ${
         isRequired ? "required" : ""
       } name="${property}--array"  id="middleView-propertyForm-input-${indx}"data-bs-toggle="tooltip" data-bs-placement="top" title="${tooltip(
         "Array"
