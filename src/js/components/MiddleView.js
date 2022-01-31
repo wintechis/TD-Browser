@@ -80,7 +80,10 @@ class MiddleView {
         case "middleView--editIcon":
           this.#currentRequestTime = undefined;
           $(".middleView-affordanceTitleContainer").nextAll().remove();
-          this.#appendUpdatePropertyForm([this.#currentProperty[0]], true);
+          this.#appendUpdatePropertyForm(
+            [this.#currentProperty[0]],
+            "writeproperty"
+          );
           break;
         case "middleView--refreshIcon":
           this.appendProperty(this.#currentProperty);
@@ -462,7 +465,8 @@ class MiddleView {
     );
     this.#LV.toggleObserveIcon(this.#tc.currentProperty[0]);
   }
-  #appendUpdatePropertyForm(properties, isRequired) {
+  #appendUpdatePropertyForm(properties, formType) {
+    let isRequired = formType === "writeallproperties" ? true : false;
     let inputElements = "";
     let propertiesTD = this.#tc.getPropertiesTD();
     let tooltip = (type, unit, min, max) => {
@@ -489,9 +493,9 @@ class MiddleView {
       }
     };
     let integerInput = (property, indx, isRequired, unit, min, max) =>
-      `<label>${
+      `<label><span>${
         property.includes("nestedProperty") ? property.split("--")[2] : property
-      } <input type="number" ${
+      }</span><input type="number" ${
         isRequired ? "required" : ""
       } name="${property}--integer" id="middleView-propertyForm-input-${indx}" step="1" data-bs-toggle="tooltip" data-bs-placement="top" title="${tooltip(
         "Integer",
@@ -500,9 +504,9 @@ class MiddleView {
         min
       )}"/></label>`;
     let numberInput = (property, indx, isRequired, unit, min, max) =>
-      `<label>${
+      `<label><span>${
         property.includes("nestedProperty") ? property.split("--")[2] : property
-      } <input type="number" ${
+      }</span> <input type="number" ${
         isRequired ? "required" : ""
       } name="${property}--number"  id="middleView-propertyForm-input-${indx}" data-bs-toggle="tooltip" data-bs-placement="top" title="${tooltip(
         "Number",
@@ -512,11 +516,11 @@ class MiddleView {
       )}"/></label>`;
     let stringInput = (property, indx, isRequired, enumArray) => {
       if (typeof enumArray === "object" && enumArray.length > 0) {
-        return ` <label>${
+        return ` <label><span>${
           property.includes("nestedProperty")
             ? property.split("--")[2]
             : property
-        }<select class="form-select" ${
+        }</span><select class="form-select" ${
           isRequired ? "required" : ""
         } name="${property}--string" > 
       <option value="" selected>Select a String </option>
@@ -526,11 +530,11 @@ class MiddleView {
       )}
       </select></label>`;
       } else {
-        return `<label>${
+        return `<label><span>${
           property.includes("nestedProperty")
             ? property.split("--")[2]
             : property
-        } <input type="text" ${
+        }</span> <input type="text" ${
           isRequired ? "required" : ""
         } name="${property}--string"  id="middleView-propertyForm-input-${indx}" data-bs-toggle="tooltip" data-bs-placement="top" title="${tooltip(
           "String"
@@ -538,17 +542,17 @@ class MiddleView {
       }
     };
     let arrayInput = (property, indx, isRequired) =>
-      `<label>${
+      `<label><span>${
         property.includes("nestedProperty") ? property.split("--")[2] : property
-      } <div class="textareaType-invalid" data-toggle="tooltip" data-placement="top" style="display:none;"></div> <textarea
+      }</span> <div class="textareaType-invalid" data-toggle="tooltip" data-placement="top" style="display:none;"></div> <textarea
       class="textarea-type-array" ${
         isRequired ? "required" : ""
       } name="${property}--array"  id="middleView-propertyForm-input-${indx}"data-bs-toggle="tooltip" data-bs-placement="top" title="${tooltip(
         "Array"
       )}"></textarea> </label>`;
-    let booleanInput = (property, indx, isRequired) => ` <label>${
+    let booleanInput = (property, indx, isRequired) => ` <label><span>${
       property.includes("nestedProperty") ? property.split("--")[2] : property
-    }<select class="form-select" ${
+    }</span><select class="form-select" ${
       isRequired ? "required" : ""
     } name="${property}--boolean" > 
     <option value="" selected>Select a Boolean Value </option>
@@ -603,7 +607,7 @@ class MiddleView {
       }
     });
     propertiesOfTypeObject.forEach((property) => {
-      let nestedInputElements = `<div class="nestedInputsContainer"  id="middleView-propertyForm-nestedInputsContainer-${property}"> <div class="header ">${property}</div>`;
+      let nestedInputElements = `<div class="nestedInputsContainer"  id="middleView-propertyForm-nestedInputsContainer-${property}"> <div class="header header-active">${property}</div>`;
       Object.keys(propertiesTD[property]["properties"]).forEach(
         (nestedProperty, indx) => {
           let {
@@ -700,6 +704,64 @@ class MiddleView {
       });
     };
     arrayValidator();
+    if (formType === "writemultipleproperties") {
+      let labelElements = $(
+        `.middleView-inputsContainer > label,.middleView-inputsContainer > div > label`
+      );
+      labelElements.prepend(
+        `<input class="form-check-input" name="" type="checkbox" value="false">`
+      );
+      let fieldElements = labelElements
+        .children()
+        .filter("input:not(':checkbox'),textarea,select");
+      $(fieldElements).prop("disabled", true).trigger("change");
+      $(fieldElements)
+        .not("input:text")
+        .prop("required", true)
+        .trigger("change");
+      $(fieldElements).hide();
+      let objectContainers = $(`.middleView-inputsContainer > div`);
+      objectContainers.children("label").hide();
+      $(".form-check-input").on("change", (e) => {
+        let fieldElement = $(e.target)
+          .nextUntil()
+          .filter(function () {
+            return ["input", "select", "textarea"].includes(
+              this.tagName.toLowerCase()
+            )
+              ? true
+              : false;
+          });
+        if (e.target.value === "true") {
+          $(fieldElement).prop("disabled", true).trigger("change");
+          $(fieldElement).fadeOut("400");
+          $(e.target).attr("value", "false");
+        } else {
+          $(fieldElement).prop("disabled", false).trigger("change");
+          $(fieldElement).fadeIn("400");
+          $(e.target).attr("value", "true");
+        }
+      });
+      $(`.middleView-inputsContainer > div > .header `).on("click", (e) => {
+        let labelElements = $(e.target).nextUntil();
+        let fieldElements = labelElements.children(
+          "input:not(':checkbox'),textarea,select"
+        );
+        if (e.target.value === "false") {
+          $(e.target).removeClass("header-active");
+          $(e.target).parent().removeClass("nestedInputsContainer-active");
+          $(labelElements).fadeOut("300");
+          $(fieldElements).prop("disabled", false).trigger("change");
+          $(e.target).val("true");
+        } else {
+          $(e.target).addClass("header-active");
+          $(e.target).parent().addClass("nestedInputsContainer-active");
+          $(labelElements).fadeIn("300");
+          $(fieldElements).prop("disabled", true).trigger("change");
+          $(e.target).val("false");
+        }
+      });
+    }
   }
   async #submitProperty() {
     let inputs = $("#middleView-propertyForm")
@@ -717,7 +779,7 @@ class MiddleView {
           key = input.name.split("--")[0];
         }
         let value;
-        if (input.value.length === 0) return { ...acc };
+        if (type !== "string" && input.value.length === 0) return { ...acc };
         switch (type) {
           case "number":
             value = +input.value;
@@ -734,9 +796,12 @@ class MiddleView {
           case "array":
             value = JSON.parse(input.value);
             break;
+          case "string":
+            value = input.value;
+            break;
         }
         if (input.name.includes("nestedProperty")) {
-          if (value.length !== 0) {
+          if (value.length !== 0 || type === "string") {
             if (acc.hasOwnProperty(upperKey)) acc[upperKey][key] = value;
             else {
               acc[upperKey] = {};
@@ -765,7 +830,6 @@ class MiddleView {
         break;
     }
     if (this.#currentRequestTime !== RequestTime) return undefined;
-
     let alertElement;
     let formatter = $.parseHTML(`<div class="JsonFormatter"></div>`);
     if (response.status) {
@@ -855,7 +919,6 @@ class MiddleView {
       let selectAllElement = $("#middleView-readMultiplePropertiesForm ").find(
         ".selectAll-input"
       );
-      console.log(selectAllElement);
       $(selectAllElement).on("change", () => {
         if (selectAllElement.is(":checked")) {
           $($(".form-check-input")).prop("checked", true).trigger("change");
@@ -869,12 +932,15 @@ class MiddleView {
       $(affordanceTitleContainer).append(collapseSpan);
       $("#middleView-content").append(affordanceTitleContainer);
       let writableProperties = this.#tc.getWritableProperties();
-      this.#appendUpdatePropertyForm(writableProperties, true);
+      this.#appendUpdatePropertyForm(writableProperties, "writeallproperties");
     } else if (property[0] === "writemultipleproperties") {
       $(affordanceTitleContainer).append(collapseSpan);
       $("#middleView-content").append(affordanceTitleContainer);
       let writableProperties = this.#tc.getWritableProperties();
-      this.#appendUpdatePropertyForm(writableProperties, false);
+      this.#appendUpdatePropertyForm(
+        writableProperties,
+        "writemultipleproperties"
+      );
     } else if (
       this.#tc.isPropertyWritable(property[0]) &&
       this.#tc.isPropertyReadable(property[0])
@@ -901,7 +967,7 @@ class MiddleView {
         descriptionString(property[0], propertyDescription)
       );
       $("#middleView-content").append(affordanceTitleContainer);
-      this.#appendUpdatePropertyForm([property[0]], true);
+      this.#appendUpdatePropertyForm([property[0]], "writeproperty");
     } else if (this.#tc.isPropertyReadable(property[0])) {
       $(collapseSpan).append(refreshIcon);
       $(affordanceTitleContainer).append(
