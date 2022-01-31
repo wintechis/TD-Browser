@@ -73,37 +73,53 @@
       text-align: left;
       .middleView-inputsContainer {
         border-radius: 15px;
-        padding: 10px;
         height: 100%;
         overflow: auto;
+        padding: 0 5px 0 10px;
+        span {
+          margin-left: 4px;
+        }
       }
-
       .nestedInputsContainer {
         border: 2px solid map.get(colors.$theme-colors, "primary");
         position: relative;
         margin-top: 20px;
-        padding: 0 10px 5px 10px;
+        &-active {
+          padding-bottom: 10px;
+        }
+        label {
+          margin-left: 5px;
+        }
+        textarea,
+        input[type="text"],
+        input[type="number"],
+        select {
+          width: calc(100% - 20px);
+        }
         .header {
-          position: absolute;
-          top: -12px;
-          left: 25%;
           padding: 3px;
-          background-color: map.get(colors.$theme-colors, "primary");
           display: block;
-          width: 50%;
+          cursor: pointer;
+          background-color: map.get(colors.$theme-colors, "tertiary");
+          color: map.get(colors.$theme-colors, "primary");
+          width: 100%;
           text-align: center;
-          margin: 0 auto 5px auto;
-          color: white;
+          margin: 0;
+          &-active,
+          &:hover {
+            background-color: map.get(colors.$theme-colors, "primary");
+            color: map.get(colors.$theme-colors, "tertiary");
+          }
         }
       }
       textarea,
       input[type="text"],
       input[type="number"],
       select {
-        margin: 5px 10px;
+        margin: 5px 0 10px 10px;
         border: 2px solid map.get(colors.$theme-colors, "primary");
         display: block;
-        width: 100%;
+        width: calc(100% - 10px);
       }
       textarea::placeholder,
       input::placeholder {
@@ -116,7 +132,10 @@
       }
       input[type="checkbox"] {
         background-image: none;
-        &:checked {
+        vertical-align: text-bottom;
+        cursor: pointer;
+        &:checked,
+        &:hover {
           background-color: map.get(colors.$theme-colors, "primary");
         }
       }
