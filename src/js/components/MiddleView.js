@@ -906,7 +906,7 @@ class MiddleView {
     } else if (property[0] === "readmultipleproperties") {
       $(affordanceTitleContainer).append(collapseSpan);
       let readableProperties = this.#tc.getReadableProperties();
-      let formElement = `<form id="middleView-readMultiplePropertiesForm" class="form-check"><div class="middleView-inputsContainer"> <label class="form-check-label selectAll-label"><input class="form-check-input selectAll-input" type="checkbox" value="false"> <span>Select All</span></label> ${readableProperties.reduce(
+      let formElement = `<form id="middleView-readMultiplePropertiesForm" class="form-check"><div class="middleView-inputsContainer"> <label class="form-check-label selectAll-label"><input class="form-check-input selectAll-input" type="checkbox" > <span>Select All</span></label> ${readableProperties.reduce(
         (acc, curr) => {
           return (
             acc +
@@ -919,13 +919,17 @@ class MiddleView {
       let selectAllElement = $("#middleView-readMultiplePropertiesForm ").find(
         ".selectAll-input"
       );
-      $(selectAllElement).on("change", () => {
-        if (selectAllElement.is(":checked")) {
-          $($(".form-check-input")).prop("checked", true).trigger("change");
-          $(selectAllElement).attr("value", "true");
-        } else {
-          $($(".form-check-input")).prop("checked", false).trigger("change");
+      let selectAllSpan = $(selectAllElement).next();
+      $(selectAllElement).attr("value", "false");
+      $(selectAllSpan).on("click", function (e) {
+        if ($(selectAllElement).attr("value") === "true") {
+          $(".form-check-input").prop("checked", false).trigger("change");
           $(selectAllElement).attr("value", "false");
+          $(selectAllSpan).text("Select All").removeClass("active");
+        } else {
+          $(".form-check-input").prop("checked", true).trigger("change");
+          $(selectAllElement).attr("value", "true");
+          $(selectAllSpan).text("Deselect All").addClass("active");
         }
       });
     } else if (property[0] === "writeallproperties") {
