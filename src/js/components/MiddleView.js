@@ -429,7 +429,7 @@ class MiddleView {
                 ? descriptionString(title, description)
                 : ""
             }
-            <div class="textareaType-invalid" data-toggle="tooltip" data-placement="top" style="display:none;">${exclamationIcon()}</div><textarea id="middleView-formField-${title}"  name="${title}" class="textarea-type-array" placeholder="Enter a Value of Type Array" ${
+            <div class="textareaType-invalid" data-toggle="tooltip" data-placement="top" style="display:none;">${exclamationIcon()}</div><textarea id="middleView-formField-${title}"  name="${title}" class="textarea-type-array" placeholder="Enter an array. Example:\n[ 1 , true , &quot;text&quot; ]" ${
             required ? "required" : ""
           } data-bs-toggle="tooltip" data-bs-placement="top" title="Enter a value of type array!"></textarea></div>`
         )
@@ -600,7 +600,7 @@ class MiddleView {
       `<label><span>${
         property.includes("nestedProperty") ? property.split("--")[2] : property
       }</span> <div class="textareaType-invalid" data-toggle="tooltip" data-placement="top" style="display:none;">${exclamationIcon()}</div> <textarea
-      class="textarea-type-array" placeholder="Enter a Value of Type Array" ${
+      class="textarea-type-array" placeholder="Enter an array. Example:\n[ 1 , true , &quot;text&quot; ]"  ${
         isRequired ? "required" : ""
       } name="${property}--array"  id="middleView-propertyForm-input-${indx}"data-bs-toggle="tooltip" data-bs-placement="top" title="${tooltip(
         "Array"
