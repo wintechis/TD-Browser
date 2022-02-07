@@ -515,24 +515,24 @@ class MiddleView {
     let inputElements = "";
     let propertiesTD = this.#tc.getPropertiesTD();
     let tooltip = (type, unit, min, max) => {
+      let article = type === "number" ? "a" : "an";
       if (unit && typeof max === "number" && typeof min === "number") {
-        return `Enter a value of type ${type} between ${min} ${unit} and ${max} ${unit}`;
+        return `Enter ${article} ${type} between ${min} & ${max} (${unit})`;
       } else if (
-        (unit && typeof max === "number") ||
         (unit && typeof max === "number") ||
         (unit && typeof min === "number")
       ) {
         return typeof max === "number"
-          ? `Enter a value of type ${type} and the max value is ${max} ${unit}`
-          : `Enter a value of type ${type} and the min value is ${min} ${unit}`;
+          ? `${article} ${type} & max: ${max} (${unit})`
+          : `${article} ${type} & max: ${min} (${unit})`;
       } else if (unit) {
-        return `Enter a value of type ${type} and the unit is ${unit}`;
+        return `Enter ${article} ${type} (${unit})`;
       } else if (typeof max === "number" && typeof min === "number") {
         return ` ${min} to ${max}`;
       } else if (typeof max === "number" || typeof min === "number") {
         typeof max === "number"
-          ? `Enter a value of type ${type} and the max value is ${max}`
-          : `Enter a value of type ${type} and the min value is ${min}`;
+          ? `Enter ${article} ${type} & max: ${max}`
+          : `Enter ${article} ${type} & max: ${min}`;
       } else {
         return `Enter a value of type ${type}`;
       }
@@ -540,7 +540,12 @@ class MiddleView {
     let integerInput = (property, indx, isRequired, unit, min, max) =>
       `<label><span>${
         property.includes("nestedProperty") ? property.split("--")[2] : property
-      }</span><input type="number" placeholder="Enter a Value of Type Integer" ${
+      }</span><input type="number" placeholder="${tooltip(
+        "Integer",
+        unit,
+        max,
+        min
+      )}" ${
         isRequired ? "required" : ""
       } name="${property}--integer" id="middleView-propertyForm-input-${indx}" step="1" data-bs-toggle="tooltip" data-bs-placement="top" title="${tooltip(
         "Integer",
@@ -551,10 +556,15 @@ class MiddleView {
     let numberInput = (property, indx, isRequired, unit, min, max) =>
       `<label><span>${
         property.includes("nestedProperty") ? property.split("--")[2] : property
-      }</span> <input placeholder="Enter a Value of Type Number" type="number" ${
+      }</span> <input placeholder="${tooltip(
+        "number",
+        unit,
+        max,
+        min
+      )}" type="number" ${
         isRequired ? "required" : ""
       } name="${property}--number"  id="middleView-propertyForm-input-${indx}" data-bs-toggle="tooltip" data-bs-placement="top" title="${tooltip(
-        "Number",
+        "number",
         unit,
         max,
         min
@@ -579,7 +589,7 @@ class MiddleView {
           property.includes("nestedProperty")
             ? property.split("--")[2]
             : property
-        }</span> <input type="text" placeholder="Enter a Value of Type String" ${
+        }</span> <input type="text" placeholder="Enter a string without quotation marks" ${
           isRequired ? "required" : ""
         } name="${property}--string"  id="middleView-propertyForm-input-${indx}" data-bs-toggle="tooltip" data-bs-placement="top" title="${tooltip(
           "String"
@@ -760,25 +770,27 @@ class MiddleView {
           $(e.target).attr("value", "true");
         }
       });
-      $(`.middleView-inputsContainer > div > .header `).on("click", (e) => {
-        let labelElements = $(e.target).nextUntil();
-        let fieldElements = labelElements.children(
-          "input:not(':checkbox'),textarea,select"
-        );
-        if (e.target.value === "false") {
-          $(e.target).removeClass("header-active");
-          $(e.target).parent().removeClass("nestedInputsContainer-active");
-          $(labelElements).fadeOut("300");
-          $(fieldElements).prop("disabled", false).trigger("change");
-          $(e.target).val("true");
-        } else {
-          $(e.target).addClass("header-active");
-          $(e.target).parent().addClass("nestedInputsContainer-active");
-          $(labelElements).fadeIn("300");
-          $(fieldElements).prop("disabled", true).trigger("change");
-          $(e.target).val("false");
-        }
-      });
+      $(`.middleView-inputsContainer > div > .header `)
+        .removeClass("header-active")
+        .on("click", (e) => {
+          let labelElements = $(e.target).nextUntil();
+          let fieldElements = labelElements.children(
+            "input:not(':checkbox'),textarea,select"
+          );
+          if (e.target.value === "false") {
+            $(e.target).removeClass("header-active");
+            $(e.target).parent().removeClass("nestedInputsContainer-active");
+            $(labelElements).fadeOut("300");
+            $(fieldElements).prop("disabled", false).trigger("change");
+            $(e.target).val("true");
+          } else {
+            $(e.target).addClass("header-active");
+            $(e.target).parent().addClass("nestedInputsContainer-active");
+            $(labelElements).fadeIn("300");
+            $(fieldElements).prop("disabled", true).trigger("change");
+            $(e.target).val("false");
+          }
+        });
     }
   }
   async #submitProperty() {
@@ -924,7 +936,7 @@ class MiddleView {
     } else if (property[0] === "readmultipleproperties") {
       $(affordanceTitleContainer).append(collapseSpan);
       let readableProperties = this.#tc.getReadableProperties();
-      let formElement = `<form id="middleView-readMultiplePropertiesForm" class="form-check"><div class="middleView-inputsContainer"> <label class="form-check-label selectAll-label"><input class="form-check-input selectAll-input" type="checkbox" value="false"> <span>Select All</span></label> ${readableProperties.reduce(
+      let formElement = `<form id="middleView-readMultiplePropertiesForm" class="form-check"><div class="middleView-inputsContainer"> <label class="form-check-label selectAll-label"><input class="form-check-input selectAll-input" type="checkbox" > <span>Select All</span></label> ${readableProperties.reduce(
         (acc, curr) => {
           return (
             acc +
@@ -937,13 +949,17 @@ class MiddleView {
       let selectAllElement = $("#middleView-readMultiplePropertiesForm ").find(
         ".selectAll-input"
       );
-      $(selectAllElement).on("change", () => {
-        if (selectAllElement.is(":checked")) {
-          $($(".form-check-input")).prop("checked", true).trigger("change");
-          $(selectAllElement).attr("value", "true");
-        } else {
-          $($(".form-check-input")).prop("checked", false).trigger("change");
+      let selectAllSpan = $(selectAllElement).next();
+      $(selectAllElement).attr("value", "false");
+      $(selectAllSpan).on("click", function (e) {
+        if ($(selectAllElement).attr("value") === "true") {
+          $(".form-check-input").prop("checked", false).trigger("change");
           $(selectAllElement).attr("value", "false");
+          $(selectAllSpan).text("Select All").removeClass("active");
+        } else {
+          $(".form-check-input").prop("checked", true).trigger("change");
+          $(selectAllElement).attr("value", "true");
+          $(selectAllSpan).text("Deselect All").addClass("active");
         }
       });
     } else if (property[0] === "writeallproperties") {
