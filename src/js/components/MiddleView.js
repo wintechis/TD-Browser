@@ -12,6 +12,34 @@ let collapseSpanElement = (id, content) =>
   `<span data-bs-toggle="collapse" href="#middleView-description-${id}" role="button" aria-expanded="false" aria-controls="middleView-description-${id}">
      ${content + " " + infoIconElement}
   </span>`;
+let exclamationIcon = () => `<i class="bi-exclamation-diamond-fill"></i>`;
+const arrayValidator = () => {
+  $("textarea").on("keyup", (event) => {
+    try {
+      let value = $(event.target).val();
+      if (
+        value.length === 0 ||
+        (typeof JSON.parse(value) === "object" &&
+          typeof value.length === "number")
+      ) {
+        $(event.target).parent().children("div").hide();
+      } else {
+        throw new Error("Invalid Type");
+      }
+    } catch (error) {
+      $(event.target)
+        .parent()
+        .children(".textareaType-invalid")
+        .show()
+        .attr(
+          "title",
+          error.toString() === "Invalid Type"
+            ? "Invalid Type"
+            : "Invalid Syntax"
+        );
+    }
+  });
+};
 let credentialFormElement = (securityType) =>
   `
     <form id="middleView--credentialForm" class="form-inline">
@@ -148,24 +176,24 @@ class MiddleView {
       inputs = inputs
         .filter((input) => input.value.length !== 0)
         .map((input) => {
-          if (
-            this.#currentAction.types[input.name] === "integer" ||
-            this.#currentAction.types[input.name] === "number"
-          ) {
+          let inputType = this.#currentAction.types[input.name];
+          if (inputType === "integer" || inputType === "number") {
             return { name: input.name, value: Number(input.value) };
-          } else if (this.#currentAction.types[input.name] === "boolean") {
+          } else if (inputType === "boolean") {
             return { name: input.name, value: input.value === "true" };
+          } else if (inputType === "array") {
+            return { name: input.name, value: JSON.parse(input.value) };
           }
           return input;
         });
     } else if (inputs.length === 0) {
       inputs = [{}];
     } else {
-      if (
-        this.#currentAction.types[inputs[0].name] === "integer" ||
-        this.#currentAction.types[inputs[0].name] === "number"
-      ) {
+      let inputType = this.#currentAction.types[inputs[0].name];
+      if (inputType === "integer" || inputType === "number") {
         inputs = [{ name: undefined, value: Number(inputs[0].value) }];
+      } else if (inputType === "array") {
+        inputs = [{ name: undefined, value: JSON.parse(inputs[0].value) }];
       } else if (this.#currentAction.types.undefined === "boolean") {
         inputs = [{ name: undefined, value: inputs[0].value === "true" }];
       } else {
@@ -390,6 +418,22 @@ class MiddleView {
             </div>`
         )
       );
+    } else if (type === "array") {
+      $(formElement).append(
+        $.parseHTML(
+          `<div class="array-textarea-container">${
+            title !== undefined ? collapseSpanElement(title, title) : ""
+          }   
+            ${
+              title !== undefined && description !== undefined
+                ? descriptionString(title, description)
+                : ""
+            }
+            <div class="textareaType-invalid" data-toggle="tooltip" data-placement="top" style="display:none;">${exclamationIcon()}</div><textarea id="middleView-formField-${title}"  name="${title}" class="textarea-type-array" placeholder="Enter a Value of Type Array" ${
+            required ? "required" : ""
+          } data-bs-toggle="tooltip" data-bs-placement="top" title="Enter a value of type array!"></textarea></div>`
+        )
+      );
     }
   }
   #deleteForm() {
@@ -451,6 +495,7 @@ class MiddleView {
       affordanceTitleContainer,
       actionForm
     );
+    arrayValidator();
   }
   #observeProperty() {
     let thingTitle = this.#tc.currentThingTitle;
@@ -544,7 +589,7 @@ class MiddleView {
     let arrayInput = (property, indx, isRequired) =>
       `<label><span>${
         property.includes("nestedProperty") ? property.split("--")[2] : property
-      }</span> <div class="textareaType-invalid" data-toggle="tooltip" data-placement="top" style="display:none;"></div> <textarea
+      }</span> <div class="textareaType-invalid" data-toggle="tooltip" data-placement="top" style="display:none;">${exclamationIcon()}</div> <textarea
       class="textarea-type-array" placeholder="Enter a Value of Type Array" ${
         isRequired ? "required" : ""
       } name="${property}--array"  id="middleView-propertyForm-input-${indx}"data-bs-toggle="tooltip" data-bs-placement="top" title="${tooltip(
@@ -676,33 +721,6 @@ class MiddleView {
 
     $("#middleView-content > .json-formatter-row").remove();
     $("#middleView-content").append(formElement);
-    const arrayValidator = () => {
-      $("textarea").on("keyup", (event) => {
-        try {
-          let value = $(event.target).val();
-          if (
-            value.length === 0 ||
-            (typeof JSON.parse(value) === "object" &&
-              typeof value.length === "number")
-          ) {
-            $(event.target).parent().children("div").hide();
-          } else {
-            throw new Error("Invalid Type");
-          }
-        } catch (error) {
-          $(event.target)
-            .parent()
-            .children("div")
-            .show()
-            .attr(
-              "title",
-              error.toString() === "Invalid Type"
-                ? "Invalid Type"
-                : "Invalid Syntax"
-            );
-        }
-      });
-    };
     arrayValidator();
     if (formType === "writemultipleproperties") {
       let labelElements = $(

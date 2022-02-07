@@ -588,7 +588,9 @@ class ThingsController {
         ? [payload[0], { ...payload[2].uriVariables }]
         : [
             payload[0],
-            typeof payload[1] === "object" ? { ...payload[1] } : payload[1],
+            typeof payload[1] === "object" && payload[1].length === "undefined"
+              ? { ...payload[1] }
+              : payload[1],
           ];
     this.#logger.saveRequest("invokeAction", data, thingId, requestDate);
     return await this.#currentThing
