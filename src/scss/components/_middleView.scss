@@ -139,17 +139,12 @@
           background-color: map.get(colors.$theme-colors, "primary");
         }
       }
+      .array-textarea-container {
+        position: relative;
+      }
       .textareaType-invalid {
-        width: 15px;
-        background-color: red;
-        display: block;
-        height: 15px;
-        border-radius: 50%;
+        color: #dc3545;
         position: absolute;
-        top: 39px;
-        left: -8px;
-        z-index: 100;
-        cursor: pointer;
       }
       .btn-group {
         margin: 15px 0;
@@ -214,6 +209,12 @@
       }
     }
   }
+  #middleView-actionForm {
+    .textareaType-invalid {
+      top: 15px;
+      left: -9px;
+    }
+  }
 }
 #middleView--refreshIcon {
   display: inline-block;
@@ -243,6 +244,10 @@
   // }
 }
 #middleView-propertyForm {
+  .textareaType-invalid {
+    top: 40px;
+    left: -9px;
+  }
   label {
     position: relative;
     width: 100%;
