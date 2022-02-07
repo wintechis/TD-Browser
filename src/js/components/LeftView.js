@@ -214,21 +214,21 @@ class LeftView {
     this.#tc.hasSecurity() && $("#affordanceKey").show();
     let metadata = this.#getMetadata();
     let listGroupElement = $.parseHTML(`<div class="list-group"></div>`);
-    Object.keys(metadata).forEach((key, index) => {
+    metadata.forEach((element, index) => {
       let buttonElement = $.parseHTML(
         `<button class="btn  list-group-item list-group-item-action   w-100 mb-1" type="button" data-bs-toggle="collapse" data-bs-target="#metadata-${index}" aria-expanded="false" aria-controls="metadata-${index}">
-            ${key}
+            ${element[0]}
           </button>`
       );
       let collapseElement = $.parseHTML(
         `<div class="collapse multi-collapse" id="metadata-${index}"></div>`
       );
       let cardElement = $.parseHTML(`<div class="card card-body"></div>`);
-      if (typeof metadata[key] === "object") {
-        let formatter = new JSONFormatter(metadata[key]);
+      if (typeof element[1] === "object") {
+        let formatter = new JSONFormatter(element[1]);
         $(cardElement).append(formatter.render());
       } else {
-        $(cardElement).text(metadata[key]);
+        $(cardElement).text(element[1]);
       }
       $(collapseElement).append(cardElement);
       $(listGroupElement).append(buttonElement, collapseElement);

@@ -588,7 +588,9 @@ class ThingsController {
         ? [payload[0], { ...payload[2].uriVariables }]
         : [
             payload[0],
-            typeof payload[1] === "object" ? { ...payload[1] } : payload[1],
+            typeof payload[1] === "object" && payload[1].length === "undefined"
+              ? { ...payload[1] }
+              : payload[1],
           ];
     this.#logger.saveRequest("invokeAction", data, thingId, requestDate);
     return await this.#currentThing
@@ -756,15 +758,31 @@ class ThingsController {
   }
   getMetadata() {
     if (!this.hasCurrentThing) return null;
-    let enumString =
-      "@context @type id title titles description descriptions support version created modified securityDefinitions security base links forms";
+    let enumString = [
+      "@context",
+      "@type",
+      "id",
+      "title",
+      "titles",
+      "description",
+      "descriptions",
+      "support",
+      "version",
+      "created",
+      "modified",
+      "securityDefinitions",
+      "security",
+      "base",
+      "links",
+      "forms",
+    ];
     let td = this.#getTD();
-    let metadata = Object.keys(td).reduce((accumulator, currentValue) => {
+    let metadata = enumString.reduce((accumulator, currentValue) => {
       if (td[currentValue] !== undefined && enumString.includes(currentValue)) {
-        accumulator[currentValue] = td[currentValue];
+        accumulator.push([currentValue, td[currentValue]]);
       }
-      return { ...accumulator };
-    }, {});
+      return accumulator;
+    }, []);
     return metadata;
   }
   #getTD() {
