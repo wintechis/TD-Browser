@@ -756,15 +756,31 @@ class ThingsController {
   }
   getMetadata() {
     if (!this.hasCurrentThing) return null;
-    let enumString =
-      "@context @type id title titles description descriptions support version created modified securityDefinitions security base links forms";
+    let enumString = [
+      "@context",
+      "@type",
+      "id",
+      "title",
+      "titles",
+      "description",
+      "descriptions",
+      "support",
+      "version",
+      "created",
+      "modified",
+      "securityDefinitions",
+      "security",
+      "base",
+      "links",
+      "forms",
+    ];
     let td = this.#getTD();
-    let metadata = Object.keys(td).reduce((accumulator, currentValue) => {
+    let metadata = enumString.reduce((accumulator, currentValue) => {
       if (td[currentValue] !== undefined && enumString.includes(currentValue)) {
-        accumulator[currentValue] = td[currentValue];
+        accumulator.push([currentValue, td[currentValue]]);
       }
-      return { ...accumulator };
-    }, {});
+      return accumulator;
+    }, []);
     return metadata;
   }
   #getTD() {
