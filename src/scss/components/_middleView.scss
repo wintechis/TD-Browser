@@ -100,6 +100,7 @@
           padding: 3px;
           display: block;
           cursor: pointer;
+          padding-bottom: 4px;
           background-color: map.get(colors.$theme-colors, "tertiary");
           color: map.get(colors.$theme-colors, "primary");
           width: 100%;
@@ -110,6 +111,12 @@
             background-color: map.get(colors.$theme-colors, "primary");
             color: map.get(colors.$theme-colors, "tertiary");
           }
+        }
+        .header-active:hover {
+          background-color: map.get(colors.$theme-colors, "tertiary");
+          color: map.get(colors.$theme-colors, "primary");
+          border-bottom: 2px solid map.get(colors.$theme-colors, "primary");
+          padding-bottom: 2px;
         }
       }
       textarea,
