@@ -7,3 +7,12 @@
   height: 25px;
   padding-top: 4px;
 }
+@media screen and (max-width: 828px) {
+  #footer {
+    padding-top: 12px;
+    height: 40px;
+    position: sticky;
+    width: 100%;
+    bottom: 0;
+  }
+}

@@ -5,11 +5,10 @@ let observeIcon = (propertyName) =>
   `<i id ="observeIcon--${propertyName}" class="bi-eye-fill leftView--observeIcon"> </i>`;
 let observeIconActive = (propertyName) =>
   `<i id ="observeIcon--${propertyName}" class="bi-eye-fill leftView--observeIcon--active"> </i>`;
-
 let editIcon = (propertyName) =>
   `<i id ="editIcon--${propertyName}" class="leftView--editIcon bi-pencil-fill"> </i>`;
 let readableIcon = `<i class="bi-book-fill readableIcon"> </i>`;
-
+const updateMiddleView = new Event("updateMiddleView");
 class LeftView {
   #tc;
   #mv;
@@ -68,14 +67,17 @@ class LeftView {
         case "action":
           this.highlightButton(elementID);
           this.#mv.appendActionForm(elementID.split("--")[1]);
+          document.dispatchEvent(updateMiddleView);
           break;
         case "property":
           this.highlightButton(elementID);
           this.#mv.appendProperty(elementID.split("--").splice(1, 2));
+          document.dispatchEvent(updateMiddleView);
           break;
         case "event":
           this.highlightButton(elementID);
           this.#mv.appendEvent(elementID.split("--")[1]);
+          document.dispatchEvent(updateMiddleView);
           break;
         case "observeIcon":
           $(e.target).parent().trigger("click");

@@ -8,6 +8,7 @@ import MiddleView from "./components/MiddleView";
 import RightView from "./components/RightView";
 import FAU_Logo_Div from "./components/FAU_Logo";
 import Footer from "./components/Footer";
+import responsiveness from "./mobile_view/responsiveness";
 async function App() {
   const mainDiv = $.parseHTML(`<div id="main"></div>`);
   const bodyDiv = $.parseHTML(`<div id="bodyDiv"></div>`);
@@ -31,6 +32,7 @@ async function App() {
   );
   $(mainDiv).append(Navbar.htmlElement, FAU_Logo_Div, bodyDiv, Footer);
   $(bodyDiv).hide();
+  responsiveness();
   return mainDiv;
 }
 

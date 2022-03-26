@@ -1,61 +1,73 @@
 @use "sass:map";
-@use "./abstract/colors";
+@use "./abstract/colors"; //move
 
 #main {
   display: grid;
-  grid: 0px;
   grid-template-columns: 100vw;
   height: 100vh;
-  grid-template-rows: 50px calc(100% - 75px) calc(100% - 75px) 25px;
+  grid-template-rows: 50px auto 25px;
   margin: 0;
   padding: 0;
-  #bodyDiv {
-    background-color: map.get(colors.$theme-colors, "bg-primary");
-    display: grid;
-    grid: 0px;
-    grid-template-columns: 1fr 1fr 1fr;
-    grid-template-rows: 100%;
-  }
+}
+#bodyDiv {
+  background-color: map.get(colors.$theme-colors, "bg-primary"); //move
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
 }
 #navbar {
   display: grid;
-  grid: 0px;
-  grid-template-columns: 400px auto 40px;
+  grid-template-columns: 300px auto 40px;
 }
 #leftViewContainer,
 #middleViewContainer,
 #rightViewContainer {
-  background-color: map.get(colors.$theme-colors, "bg-secondary");
-  padding: 20px 20px;
+  background-color: map.get(colors.$theme-colors, "bg-secondary"); //move
+  padding: 20px 10px;
   display: grid;
-  grid: 0px;
   grid-template-rows: 50px auto;
+  grid-template-columns: 1fr;
+
   box-shadow: rgba(0, 0, 0, 0.4) 0px 2px 4px,
-    rgba(0, 0, 0, 0.3) 0px 7px 13px -3px, rgba(0, 0, 0, 0.2) 0px -3px 0px inset;
-  margin: 20px 20px;
-  text-align: center;
-  border-radius: 15px;
+    rgba(0, 0, 0, 0.3) 0px 7px 13px -3px, rgba(0, 0, 0, 0.2) 0px -3px 0px inset; //move
+  margin: 10px 10px;
+  text-align: center; //move
+  border-radius: 15px; //move
   .body-row-1 {
-    width: 100%;
-    // padding: 0 45px;
   }
   .body-row-2 {
-    width: 100%;
-    background-color: map.get(colors.$theme-colors, "bg-primary");
+    background-color: map.get(colors.$theme-colors, "bg-primary"); //move
     padding: 10px;
-    border-radius: 15px;
+    border-radius: 15px; //move
   }
 }
-// @media (max-width: 1200px) and (min-width: 30em) {
-//   #main {
-//     grid-template-rows: 50px calc(100% - 75px) calc(100% - 75px) 25px;
-//     #bodyDiv {
-//       display: grid;
-//       grid: 0px;
-//       grid-template-columns: 1fr 1fr;
-//       #rightViewContainer {
-//         display: none;
-//       }
-//     }
-//   }
-// }
+
+@media screen and (max-width: 828px) {
+  #main {
+    grid-template-rows: 50px calc(100vh - 90px) 40px;
+  }
+  #navbar {
+    grid-template-columns: auto 100px 40px;
+  }
+  #bodyDiv {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
+  }
+  #leftViewContainer {
+    grid-template-rows: auto;
+  }
+  #leftViewContainer,
+  #middleViewContainer,
+  #rightViewContainer {
+    padding: 0;
+    margin: 0;
+    border-radius: 0px; //move
+    box-shadow: none; //move
+    grid-template-rows: calc(100vh - 80px);
+    .body-row-1 {
+    }
+    .body-row-2 {
+      height: auto;
+      border-radius: 0px; //move
+    }
+  }
+}

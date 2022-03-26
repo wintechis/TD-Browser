@@ -1,6 +1,7 @@
 "use strict";
 import "@node-wot/browser-bundle";
 import axios from "axios";
+const newEvent = new Event("newEvent");
 class ThingsController {
   #things = {};
   #currentProperty = [];
@@ -527,7 +528,6 @@ class ThingsController {
           responseDate,
           false
         );
-        console.log(e.toString());
         return e.toString();
       });
   }
@@ -651,6 +651,7 @@ class ThingsController {
             responseDate,
             true
           );
+          document.dispatchEvent(newEvent);
         },
         (err) => {
           const responseDate = Date.now().toString();

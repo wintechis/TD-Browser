@@ -8,15 +8,16 @@ let alertElement = (text, type, id) => {
   return `
   <div id="${id}" class="alert alert-${type} position-fixed top-0 start-0 p-3 w-100" style="z-index: 11" role="alert">${text}</div>`;
 };
+const fileConsumed = new Event("fileConsumed");
 class Navbar {
   #LV;
   #tc;
   #MV;
   #htmlElement = $.parseHTML(
     `<div id="navbar" class="">
-            <form id="consumingForm" class="p-2 d-inline-block">
-              <input class=" p-2 " type="url" name="thingURL" id="thingURL" placeholder="URL" ia-label="Search">
-              <input class=" p-2 "type="file" name="thingFile" id="fileInput">
+            <form id="consumingForm" class="">
+              <input class=" " type="url" name="thingURL" id="thingURL" placeholder="URL" ia-label="Search">
+              <input class=""type="file" name="thingFile" accept=".json,.jsonld" id="fileInput">
               <button class="btn" id="fileInputTrigger" style="display:none" type="button">Upload</button> 
               <button class="btn" type="submit" id="consumeButton" >Consume</button>
             </form>
@@ -55,7 +56,8 @@ class Navbar {
             : $("#fileInput").trigger("click");
           break;
         case "thingAvatar":
-          this.#changeCurrentThing(e.target.id);
+          !e.target.id.includes("switcher--") &&
+            this.#changeCurrentThing(e.target.id);
           break;
         case "settings-form-save":
           Settings.saveSettings();
@@ -74,13 +76,7 @@ class Navbar {
       .on("change", () => {
         let file = $("#fileInput").prop("files");
         try {
-          if (
-            file[0].type !== "application/json" &&
-            file[0].type !== "application/ld+json" &&
-            file[0].name.split(".")[1] !== "jsonld"
-          ) {
-            throw "Select only a file of type JSON!";
-          } else if (file[0].size === 0) {
+          if (file[0].size === 0) {
             throw "The selected file is empty!";
           } else {
             this.#onSubmit();
@@ -105,23 +101,23 @@ class Navbar {
       await this.#tc.consume(td);
       key = !key;
       $("#thingURL").attr("type", "url");
-    } else if (isURL(url)) {
-      await axios
-        .get(url)
-        .then(async (response) => {
+    } else {
+      try {
+        url = !url.toLocaleLowerCase().includes("http")
+          ? new URL("http://" + url)
+          : new URL(url);
+        await axios.get(url).then(async (response) => {
           let td = response.data;
           await this.#tc.consume(td);
           key = !key;
-        })
-        .catch((error) => {
-          let alertId = "alert-" + Date.now();
-          $("body")
-            .append(alertElement(`Failed to Consume`, "danger", alertId))
-            .show("slow");
-          setTimeout(() => {
-            $("#" + alertId).remove();
-          }, 2000);
         });
+      } catch (error) {
+        let alertId = "alert-" + Date.now();
+        $("body").append(alertElement(error, "danger", alertId)).show("slow");
+        setTimeout(() => {
+          $("#" + alertId).remove();
+        }, 2000);
+      }
     }
     $("#consumeButton").html("Consume");
     if (key) {
@@ -136,6 +132,7 @@ class Navbar {
       this.#LV.highlightButton("affordanceMetadata");
       this.#MV.clearMiddleViewContent();
       this.#MV.addMiddleViewTitle(this.#tc.currentThingTitle);
+      document.dispatchEvent(fileConsumed);
       let alertId = "alert-" + Date.now();
       $("body")
         .append(

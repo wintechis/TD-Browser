@@ -1,0 +1,52 @@
+@use "sass:map";
+@use "../abstract/colors";
+#controller {
+  position: sticky;
+  width: 100%;
+  bottom: 0;
+}
+#controllerButtonsContainer {
+  display: grid;
+  grid-template-columns: repeat(4, auto) 0.5fr;
+  .btn {
+    background-color: map.get(colors.$theme-colors, "secondary");
+    display: inline-block;
+    color: map.get(colors.$theme-colors, "tertiary");
+    height: 40px;
+    padding: 0;
+    border-radius: 0;
+    border: 1px solid map.get(colors.$theme-colors, "tertiary");
+    &-active {
+      background-color: map.get(colors.$theme-colors, "tertiary");
+      color: map.get(colors.$theme-colors, "secondary");
+      border: 2px solid map.get(colors.$theme-colors, "secondary");
+    }
+    &-orange {
+      background-color: #df7900;
+    }
+  }
+  .btn:hover {
+    background-color: map.get(colors.$theme-colors, "tertiary");
+    color: map.get(colors.$theme-colors, "secondary");
+    border: 2px solid map.get(colors.$theme-colors, "secondary");
+  }
+  .btn-topLevel {
+    background-color: map.get(colors.$theme-colors, "secondary");
+  }
+
+  .btn-active {
+    background-color: map.get(colors.$theme-colors, "tertiary");
+    color: map.get(colors.$theme-colors, "primary");
+    border: 2px solid map.get(colors.$theme-colors, "primary");
+  }
+  .btn-topLevel-active {
+    background-color: map.get(colors.$theme-colors, "tertiary");
+    color: map.get(colors.$theme-colors, "secondary");
+    border: 2px solid map.get(colors.$theme-colors, "secondary");
+  }
+}
+@media screen and (min-width: 425px) {
+  #controllerButtonsContainer {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
