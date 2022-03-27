@@ -15,3 +15,9 @@
     }
   }
 }
+.json-formatter-row {
+  span {
+    overflow-wrap: break-word !important;
+    white-space: normal !important;
+  }
+}
