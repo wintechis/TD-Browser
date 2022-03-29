@@ -1,6 +1,7 @@
 "use strict";
 import $ from "jquery";
 import JSONFormatter from "json-formatter-js";
+import UriVariables from "./UriVariables";
 let observeIcon = `<i id="middleView--observeIcon" class="bi-eye-fill"> </i>`;
 let observeIconActive = `<i id="middleView--observeIcon" class="bi-eye-fill middleView--observeIcon--active"> </i>`;
 let refreshIcon = `<span id="middleView--refreshIcon"class="bi-arrow-clockwise"/>`;
@@ -109,7 +110,7 @@ class MiddleView {
           this.#currentRequestTime = undefined;
           $(".middleView-affordanceTitleContainer").nextAll().remove();
           this.#appendUpdatePropertyForm(
-            [this.#currentProperty[0]],
+            [this.#currentProperty],
             "writeproperty"
           );
           break;
@@ -133,24 +134,36 @@ class MiddleView {
   #onSubmit() {
     $(this.#htmlElement).on("submit", (e) => {
       e.preventDefault();
+      let uriVariables;
+      if (
+        $("#middleView-uriVariablesForm").length &&
+        !UriVariables.reportValidity()
+      )
+        return false;
+      else if ($("#middleView-uriVariablesForm").length) {
+        uriVariables = UriVariables.values();
+      }
       let formID = e.target.id;
       switch (formID) {
         case "middleView-actionForm":
-          this.#submitAction(e);
+          this.#submitAction(e, uriVariables);
           this.#deleteForm();
           break;
         case "middleView-propertyForm":
-          this.#submitProperty(e);
+          this.#submitProperty(e, uriVariables);
+          this.#deleteForm();
+          break;
+        case "middleView-uriVariablesPropertyForm":
+          this.#handelUriVariablesPropertyForm(e, uriVariables);
           this.#deleteForm();
           break;
         case "middleView--credentialForm":
-          this.#submitCredential(e);
+          this.#submitCredential(e, uriVariables);
           this.#deleteForm();
           break;
         case "middleView-readMultiplePropertiesForm":
           this.#handleReadMultiplePropertiesForm();
           this.#deleteForm();
-
           break;
         default:
           break;
@@ -169,54 +182,42 @@ class MiddleView {
     $("#middleView--subscribeEvent").show();
   }
 
-  async #submitAction(e) {
-    let payload = [this.#currentAction.actionName];
+  async #submitAction(e, uriVariables) {
+    const action = this.#currentAction.actionName;
+    let payload;
     let inputs = $("#middleView-actionForm").serializeArray();
     if (inputs.length > 1) {
-      inputs = inputs
+      payload = inputs
         .filter((input) => input.value.length !== 0)
-        .map((input) => {
+        .reduce((accumulator, input) => {
           let inputType = this.#currentAction.types[input.name];
+          let value = input.value;
           if (inputType === "integer" || inputType === "number") {
-            return { name: input.name, value: Number(input.value) };
+            value = Number(value);
           } else if (inputType === "boolean") {
-            return { name: input.name, value: input.value === "true" };
+            value = value === "true";
           } else if (inputType === "array") {
-            return { name: input.name, value: JSON.parse(input.value) };
+            value = JSON.parse(value);
           }
-          return input;
-        });
+          return { ...accumulator, [input.name]: value };
+        }, {});
     } else if (inputs.length === 0) {
-      inputs = [{}];
+      payload = undefined;
     } else {
       let inputType = this.#currentAction.types[inputs[0].name];
       if (inputType === "integer" || inputType === "number") {
-        inputs = [{ name: undefined, value: Number(inputs[0].value) }];
+        payload = Number(inputs[0].value);
       } else if (inputType === "array") {
-        inputs = [{ name: undefined, value: JSON.parse(inputs[0].value) }];
+        payload = JSON.parse(inputs[0].value);
       } else if (this.#currentAction.types.undefined === "boolean") {
-        inputs = [{ name: undefined, value: inputs[0].value === "true" }];
+        payload = inputs[0].value === "true";
       } else {
-        inputs = [{ name: inputs[0].name, value: inputs[0].value }];
+        payload = inputs[0].value;
       }
-    }
-    let inputsObject = inputs.reduce((accumulator, current) => {
-      accumulator[current.name] = current.value;
-      return { ...accumulator };
-    }, {});
-    if (this.#currentAction.hasUriVariables) {
-      payload.push(undefined, { uriVariables: { ...inputsObject } });
-    } else if (
-      Object.keys(inputsObject).length === 1 &&
-      inputsObject.hasOwnProperty("undefined")
-    ) {
-      payload[1] = inputsObject.undefined;
-    } else {
-      payload.push(inputsObject);
     }
     let RequestTime = Date.now();
     this.#currentRequestTime = RequestTime;
-    let response = await this.#tc.invokeAction(payload);
+    let response = await this.#tc.invokeAction(action, payload, uriVariables);
     if (this.#currentRequestTime === RequestTime) {
       let formatter = $.parseHTML(`<div class="JsonFormatter"></div>`);
       $(formatter).append(new JSONFormatter(response, 1).render());
@@ -234,31 +235,12 @@ class MiddleView {
     let username = $("#middleView--credentialForm--username").val();
     this.#tc.addCredential(username, password);
   }
-  #generateActionForm(action, actionObj) {
+  #generateActionForm(actionObj) {
     let formElement = $.parseHTML(`<form id="middleView-actionForm"></form>`);
     let inputsContainer = $.parseHTML(
       `<div class="middleView-inputsContainer"></div>`
     );
-    if (typeof actionObj.uriVariables === "object") {
-      let uriVariables = {
-        ...actionObj.uriVariables,
-      };
-      Object.keys(uriVariables).forEach((val, indx) => {
-        let uriVariable = uriVariables[val];
-        let formFields = this.#generateFormFields(
-          inputsContainer,
-          uriVariable.type,
-          val,
-          uriVariable.description,
-          uriVariable.enum,
-          uriVariable.minimum,
-          uriVariable.maximum,
-          true,
-          uriVariable.unit
-        );
-        $(inputsContainer).append(formFields);
-      });
-    } else if (
+    if (
       actionObj.hasOwnProperty("input") &&
       actionObj.input.hasOwnProperty("properties")
     ) {
@@ -353,6 +335,7 @@ class MiddleView {
       placeholder = undefined;
     }
     if (typeof enumArray !== "undefined") {
+      $(select).append(`<option value="" selected>Select a String </option>`);
       enumArray.forEach((val) =>
         $(select).append(`<option  value="${val}" >${val}</option>`)
       );
@@ -448,15 +431,13 @@ class MiddleView {
   appendActionForm(actionName) {
     this.resetMiddleView();
     let actionObj = this.#tc.getActionForm(actionName);
-    let uriVariables = actionObj.uriVariables;
     let properties =
       actionObj.input !== undefined ? actionObj.input.properties : undefined;
     let types;
-    if (uriVariables) {
-      types = Object.keys(uriVariables).reduce((accumulator, key) => {
-        return { ...accumulator, [key]: uriVariables[key].type };
-      }, {});
-    } else if (properties) {
+    const uriVariablesForm = actionObj.hasOwnProperty("uriVariables")
+      ? UriVariables.htmlElement(actionObj.uriVariables)
+      : [];
+    if (properties) {
       types = Object.keys(properties).reduce((accumulator, key) => {
         return { ...accumulator, [key]: properties[key].type };
       }, {});
@@ -476,7 +457,6 @@ class MiddleView {
     this.#currentAction = {
       types,
       actionName,
-      hasUriVariables: typeof uriVariables === "object" ? true : false,
     };
     let affordanceTitleContainer = $.parseHTML(
       `<div class="middleView-affordanceTitleContainer"></div>`
@@ -489,10 +469,11 @@ class MiddleView {
     );
     $("#middleView--backIcon").remove();
     let backIcon = `<span id="middleView--backIcon" class="bi-arrow-left-circle-fill" ></span>`;
-    let actionForm = this.#generateActionForm(actionName, actionObj);
+    let actionForm = this.#generateActionForm(actionObj);
     $("#middleView-content").append(
       backIcon,
       affordanceTitleContainer,
+      uriVariablesForm,
       actionForm
     );
     arrayValidator();
@@ -730,6 +711,9 @@ class MiddleView {
     $(formElement).append(inputsContainer, submitButtonElement);
 
     $("#middleView-content > .json-formatter-row").remove();
+    formType === "writeproperty" &&
+      this.#tc.hasUriVariables("properties", this.#currentProperty) &&
+      this.#appendUriVariablesPropertyForm(this.#currentProperty, true);
     $("#middleView-content").append(formElement);
     arrayValidator();
     if (formType === "writemultipleproperties") {
@@ -793,60 +777,59 @@ class MiddleView {
         });
     }
   }
-  async #submitProperty() {
-    let inputs = $("#middleView-propertyForm")
-      .serializeArray()
-      .reduce((acc, input) => {
-        let type;
-        let key;
-        let upperKey;
-        if (input.name.includes("nestedProperty")) {
-          type = input.name.split("--")[3];
-          key = input.name.split("--")[2];
-          upperKey = input.name.split("--")[1];
-        } else {
-          type = input.name.split("--")[1];
-          key = input.name.split("--")[0];
-        }
-        let value;
-        if (type !== "string" && input.value.length === 0) return { ...acc };
-        switch (type) {
-          case "number":
-            value = +input.value;
-            break;
-          case "integer":
-            value = Math.floor(+input.value);
-            break;
-          case "number":
-            value = +input.value;
-            break;
-          case "boolean":
-            value = input.value === "true";
-            break;
-          case "array":
-            value = JSON.parse(input.value);
-            break;
-          case "string":
-            value = input.value;
-            break;
-        }
-        if (input.name.includes("nestedProperty")) {
-          if (value.length !== 0 || type === "string") {
-            if (acc.hasOwnProperty(upperKey)) acc[upperKey][key] = value;
-            else {
-              acc[upperKey] = {};
-              acc[upperKey][key] = value;
-            }
+  async #submitProperty(e, uriVariables) {
+    let inputs = $("#middleView-propertyForm").serializeArray();
+    inputs = inputs.reduce((acc, input) => {
+      let type;
+      let key;
+      let upperKey;
+      if (input.name.includes("nestedProperty")) {
+        type = input.name.split("--")[3];
+        key = input.name.split("--")[2];
+        upperKey = input.name.split("--")[1];
+      } else {
+        type = input.name.split("--")[1];
+        key = input.name.split("--")[0];
+      }
+      let value;
+      if (type !== "string" && input.value.length === 0) return { ...acc };
+      switch (type) {
+        case "number":
+          value = +input.value;
+          break;
+        case "integer":
+          value = Math.floor(+input.value);
+          break;
+        case "number":
+          value = +input.value;
+          break;
+        case "boolean":
+          value = input.value === "true";
+          break;
+        case "array":
+          value = JSON.parse(input.value);
+          break;
+        case "string":
+          value = input.value;
+          break;
+      }
+      if (input.name.includes("nestedProperty")) {
+        if (value.length !== 0 || type === "string") {
+          if (acc.hasOwnProperty(upperKey)) acc[upperKey][key] = value;
+          else {
+            acc[upperKey] = {};
+            acc[upperKey][key] = value;
           }
-          return { ...acc };
-        } else {
-          return { ...acc, [key]: value };
         }
-      }, {});
+        return { ...acc };
+      } else {
+        return { ...acc, [key]: value };
+      }
+    }, {});
     let response;
     let RequestTime = Date.now();
     this.#currentRequestTime = RequestTime;
-    switch (this.#currentProperty[0]) {
+    switch (this.#currentProperty) {
       case "writeallproperties":
         response = await this.#tc.writeAllProperties(inputs);
         break;
@@ -855,7 +838,9 @@ class MiddleView {
         break;
       default:
         response = await this.#tc.writeProperty(
-          inputs[this.#currentProperty[0]]
+          this.#currentProperty,
+          inputs[this.#currentProperty],
+          uriVariables
         );
         break;
     }
@@ -866,19 +851,19 @@ class MiddleView {
       alertElement =
         $.parseHTML(`<div class="alert alert-success alert-dismissible fade show" role="alert"><strong>Property Updated</strong>
        </div>`);
-      $(formatter).append(
-        new JSONFormatter({ response: response.data }, 1).render()
-      );
+      // $(formatter).append(
+      //   new JSONFormatter({ response: response.data }, 1).render()
+      // );
     } else {
       alertElement = $.parseHTML(
         `<div class="alert alert-danger alert-dismissible fade show" role="alert"><strong>Failed to Update</strong> <div>${response.data}</div></div>`
       );
-      $(formatter).append(
-        new JSONFormatter({ response: response.data }, 1).render()
-      );
+      // $(formatter).append(
+      //   new JSONFormatter({ response: response.data }, 1).render()
+      // );
     }
-    $(alertElement).append(formatter);
-    $("#middleView-content").append(formatter);
+    // $(alertElement).append(formatter);
+    $("#middleView-content").append(alertElement);
   }
   async #handleReadMultiplePropertiesForm() {
     let properties = $("#middleView-readMultiplePropertiesForm")
@@ -903,25 +888,22 @@ class MiddleView {
       "readmultipleproperties",
       "writeallproperties",
       "writemultipleproperties",
-    ].includes(property[0]);
+    ].includes(property);
     let propertyDescription = isTopLevelForm
       ? undefined
-      : this.#tc.getPropertyDescription(property[0]);
-    let title =
-      property.length === 2
-        ? property.toString().replace(",", " : ")
-        : property[0];
+      : this.#tc.getPropertyDescription(property);
+    let title = property;
     let affordanceTitleContainer = $.parseHTML(
       `<div class="middleView-affordanceTitleContainer"></div>`
     );
     let collapseSpan = $.parseHTML(`<div></div>`);
-    $(collapseSpan).append(collapseSpanElement(property[0], title));
+    $(collapseSpan).append(collapseSpanElement(property, title));
     !isTopLevelForm &&
-      this.#tc.isPropertyObservable(property[0]) &&
+      this.#tc.isPropertyObservable(property) &&
       $(collapseSpan).append(
         this.#tc.isPropertyObserved() ? observeIconActive : observeIcon
       );
-    if (property[0] === "readallproperties") {
+    if (property === "readallproperties") {
       $(collapseSpan).append(refreshIcon);
       $(affordanceTitleContainer).append(collapseSpan);
       $("#middleView-content").append(affordanceTitleContainer);
@@ -933,7 +915,7 @@ class MiddleView {
         $(formatter).append(new JSONFormatter(response, 1).render());
         $("#middleView-content").append(formatter);
       }
-    } else if (property[0] === "readmultipleproperties") {
+    } else if (property === "readmultipleproperties") {
       $(affordanceTitleContainer).append(collapseSpan);
       let readableProperties = this.#tc.getReadableProperties();
       let formElement = `<form id="middleView-readMultiplePropertiesForm" class="form-check"><div class="middleView-inputsContainer"> <label class="form-check-label selectAll-label"><input class="form-check-input selectAll-input" type="checkbox" > <span>Select All</span></label> ${readableProperties.reduce(
@@ -962,12 +944,12 @@ class MiddleView {
           $(selectAllSpan).text("Deselect All").addClass("active");
         }
       });
-    } else if (property[0] === "writeallproperties") {
+    } else if (property === "writeallproperties") {
       $(affordanceTitleContainer).append(collapseSpan);
       $("#middleView-content").append(affordanceTitleContainer);
       let writableProperties = this.#tc.getWritableProperties();
       this.#appendUpdatePropertyForm(writableProperties, "writeallproperties");
-    } else if (property[0] === "writemultipleproperties") {
+    } else if (property === "writemultipleproperties") {
       $(affordanceTitleContainer).append(collapseSpan);
       $("#middleView-content").append(affordanceTitleContainer);
       let writableProperties = this.#tc.getWritableProperties();
@@ -976,47 +958,83 @@ class MiddleView {
         "writemultipleproperties"
       );
     } else if (
-      this.#tc.isPropertyWritable(property[0]) &&
-      this.#tc.isPropertyReadable(property[0])
+      this.#tc.isPropertyWritable(property) &&
+      this.#tc.isPropertyReadable(property)
     ) {
       $(collapseSpan).append(refreshIcon);
       $(collapseSpan).append(editIcon);
       $(affordanceTitleContainer).append(
         collapseSpan,
-        descriptionString(property[0], propertyDescription)
+        descriptionString(property, propertyDescription)
       );
       $("#middleView-content").append(affordanceTitleContainer);
-      let RequestTime = Date.now();
-      this.#currentRequestTime = RequestTime;
-      let response = await this.#tc.readProperty(...property);
-      if (this.#currentRequestTime === RequestTime) {
-        let formatter = $.parseHTML(`<div class="JsonFormatter"></div>`);
-        $(formatter).append(new JSONFormatter(response, 1).render());
-        $("#middleView-content").append(formatter);
+      if (this.#tc.hasUriVariables("properties", property)) {
+        this.#appendUriVariablesPropertyForm(property);
+      } else {
+        let RequestTime = Date.now();
+        this.#currentRequestTime = RequestTime;
+        let response = await this.#tc.readProperty(property);
+        if (this.#currentRequestTime === RequestTime) {
+          let formatter = $.parseHTML(`<div class="JsonFormatter"></div>`);
+          $(formatter).append(new JSONFormatter(response, 1).render());
+          $("#middleView-content").append(formatter);
+        }
       }
-    } else if (this.#tc.isPropertyWritable(property[0])) {
+    } else if (this.#tc.isPropertyWritable(property)) {
       $(collapseSpan).append(editIcon);
       $(affordanceTitleContainer).append(
         collapseSpan,
-        descriptionString(property[0], propertyDescription)
+        descriptionString(property, propertyDescription)
       );
       $("#middleView-content").append(affordanceTitleContainer);
-      this.#appendUpdatePropertyForm([property[0]], "writeproperty");
-    } else if (this.#tc.isPropertyReadable(property[0])) {
+      this.#appendUpdatePropertyForm([property], "writeproperty");
+    } else if (this.#tc.isPropertyReadable(property)) {
       $(collapseSpan).append(refreshIcon);
       $(affordanceTitleContainer).append(
         collapseSpan,
-        descriptionString(property[0], propertyDescription)
+        descriptionString(property, propertyDescription)
       );
       $("#middleView-content").append(affordanceTitleContainer);
-      let RequestTime = Date.now();
-      let response = await this.#tc.readProperty(...property);
-      this.#currentRequestTime = RequestTime;
-      if (this.#currentRequestTime === RequestTime) {
-        let formatter = $.parseHTML(`<div class="JsonFormatter"></div>`);
-        $(formatter).append(new JSONFormatter(response, 1).render());
-        $("#middleView-content").append(formatter);
+      if (this.#tc.hasUriVariables("properties", property)) {
+        this.#appendUriVariablesPropertyForm(property);
+      } else {
+        let RequestTime = Date.now();
+        let response = await this.#tc.readProperty(property);
+        this.#currentRequestTime = RequestTime;
+        if (this.#currentRequestTime === RequestTime) {
+          let formatter = $.parseHTML(`<div class="JsonFormatter"></div>`);
+          $(formatter).append(new JSONFormatter(response, 1).render());
+          $("#middleView-content").append(formatter);
+        }
       }
+    }
+  }
+  #appendUriVariablesPropertyForm(
+    property = this.#currentProperty,
+    isForUpdate = false
+  ) {
+    const uriVariables = this.#tc.getUriVariables("properties", property);
+    const uriVariablesForm = UriVariables.htmlElement(uriVariables);
+    if (isForUpdate) {
+      $("#middleView-content").append(uriVariablesForm);
+    } else {
+      const submitButtonElement = `<button class="btn btn-submit" type="submit">Read</button>`;
+      const formElement = $.parseHTML(
+        `<form id="middleView-uriVariablesPropertyForm"></form>`
+      );
+      $(formElement).append(uriVariablesForm, submitButtonElement);
+      $("#middleView-content").append(formElement);
+    }
+  }
+  async #handelUriVariablesPropertyForm(e, uriVariables) {
+    const property = this.#currentProperty;
+    let RequestTime = Date.now();
+    this.#currentRequestTime = RequestTime;
+    let response = await this.#tc.readProperty(property, uriVariables);
+    if (this.#currentRequestTime === RequestTime) {
+      let formatter = $.parseHTML(`<div class="JsonFormatter"></div>`);
+      $(formatter).append(new JSONFormatter(response, 1).render());
+      $("#middleView-content").append(formatter);
     }
   }
   appendEvent(event) {

@@ -71,7 +71,7 @@ class LeftView {
           break;
         case "property":
           this.highlightButton(elementID);
-          this.#mv.appendProperty(elementID.split("--").splice(1, 2));
+          this.#mv.appendProperty(elementID.split("--")[1]);
           document.dispatchEvent(updateMiddleView);
           break;
         case "event":
@@ -161,10 +161,7 @@ class LeftView {
     };
     let listGroupElement = $.parseHTML(`<div class="list-group"></div>`);
     Object.keys(properties).forEach((property) => {
-      let hasUriVariables =
-        typeof properties[property].uriVariables === "object" ? true : false;
       let observable = properties[property].observable;
-      let readOnly = properties[property].readOnly;
       let isPropertyReadable = this.#tc.isPropertyReadable(property);
       let isPropertyWritable = this.#tc.isPropertyWritable(property);
       let isTopLevelForm = [
@@ -173,10 +170,9 @@ class LeftView {
         "writeallproperties",
         "writemultipleproperties",
       ].includes(property);
-
       let buttonElement = $.parseHTML(
         `<button id="${
-          !hasUriVariables && "property--" + property
+          "property--" + property
         }" class="btn  list-group-item list-group-item-action  w-100 mb-1 ${
           isTopLevelForm ? "btn-topLevel" : ""
         }" type="button" data-bs-toggle="collapse" data-bs-target="#property--collapse--${property}" aria-expanded="false" aria-controls="property--collapse--${property}">
@@ -193,20 +189,6 @@ class LeftView {
             : observeIcon(property)
         );
       $(listGroupElement).append(buttonElement);
-      if (hasUriVariables) {
-        let uriVariables = properties[property].uriVariables.id.enum;
-        let collapseElement = $.parseHTML(
-          `<div class="collapse multi-collapse" id="property--collapse--${property}"></div>`
-        );
-        let cardElement = $.parseHTML(`<div class="card card-body"></div>`);
-        uriVariables.forEach((variable) => {
-          $(cardElement).append(
-            `<button class="btn  w-100 mb-1" type="button" id="property--${property}--${variable}">${variable}</button>`
-          );
-        });
-        $(collapseElement).append(cardElement);
-        $(listGroupElement).append(collapseElement);
-      }
     });
     $("#affordance").append(listGroupElement);
   }

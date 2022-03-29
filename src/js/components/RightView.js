@@ -44,48 +44,24 @@ class RightView {
   appendRequestToView(title, request) {
     const formattedTime = this.#formatTime(request.date);
     let formattedData;
-    if (
-      [
-        "readProperty",
-        "readAllProperties",
-        "observeProperty",
-        "unobserveProperty",
-        "subscribeEvent",
-      ].includes(request.type)
-    ) {
-      formattedData = undefined;
-    } else if (request.type === "writeProperty") {
-      formattedData = new JSONFormatter(request.data[2]).render();
-    } else if (request.type === "invokeAction") {
-      formattedData = request.data[1]
-        ? new JSONFormatter(request.data[1]).render()
-        : undefined;
+    if (request.data && request.uriVariables) {
+      formattedData = new JSONFormatter({
+        uriVariables: request.uriVariables,
+        body: request.data,
+      }).render();
+    } else if (request.data || request.uriVariables) {
+      formattedData =
+        request.uriVariables === undefined
+          ? new JSONFormatter({ body: request.data }).render()
+          : new JSONFormatter({ uriVariables: request.uriVariables }).render();
     } else {
-      formattedData = new JSONFormatter(request.data).render();
+      formattedData = undefined;
     }
     const card = $.parseHTML(
       `<div class="card card-request text-center mb-3"> </div>`
     );
     const cardHeader = () => {
-      let headerText;
-      if (request.type === "invokeAction") {
-        headerText = request.data[0];
-      } else if (request.type === "writeProperty") {
-        headerText = request.data[1]
-          ? request.data[0] + " : " + request.data[1]
-          : request.data[0];
-      } else if (
-        [
-          "readAllProperties",
-          "readMultipleProperties",
-          "writeAllProperties",
-          "writeMultipleProperties",
-        ].includes(request.type)
-      ) {
-        headerText = undefined;
-      } else {
-        headerText = request.data.join(" : ");
-      }
+      let headerText = request.interactionAffordance;
       return $.parseHTML(
         `<div class="card-header ${
           formattedData ? "" : "card-header-pointer-none"
@@ -124,9 +100,9 @@ class RightView {
   appendResponseToView(title, response, request) {
     const formattedTime = this.#formatTime(response.date);
     const formattedData =
-      response.data[0] === undefined
+      response.data === undefined
         ? undefined
-        : new JSONFormatter(response.data[0]).render();
+        : new JSONFormatter(response.data).render();
     const card = $.parseHTML(
       `<div class=" ${
         response.status ? "" : "card-response-failed"
@@ -137,25 +113,7 @@ class RightView {
       } text-center mb-3"></div>`
     );
     const cardHeader = () => {
-      let headerText;
-      if (request.type === "invokeAction") {
-        headerText = request.data[0];
-      } else if (request.type === "writeProperty") {
-        headerText = request.data[1]
-          ? request.data[0] + " : " + request.data[1]
-          : request.data[0];
-      } else if (
-        [
-          "readAllProperties",
-          "readMultipleProperties",
-          "writeAllProperties",
-          "writeMultipleProperties",
-        ].includes(request.type)
-      ) {
-        headerText = undefined;
-      } else {
-        headerText = request.data.join(" : ");
-      }
+      let headerText = request.interactionAffordance;
       return $.parseHTML(
         `<div class="card-header ${
           formattedData ? "" : "card-header-pointer-none"

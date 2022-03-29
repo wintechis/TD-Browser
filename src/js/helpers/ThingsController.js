@@ -37,6 +37,14 @@ class ThingsController {
       return false;
     }
   }
+  hasUriVariables(affordance, interactionAffordance) {
+    const td = this.#getTD();
+    return td[affordance][interactionAffordance].hasOwnProperty("uriVariables");
+  }
+  getUriVariables(affordance, interactionAffordance) {
+    const td = this.#getTD();
+    return td[affordance][interactionAffordance].uriVariables;
+  }
   addCredential(username, password) {
     this.#currentThing.getServient().addCredentials({
       [this.#currentThing.id]: {
@@ -230,7 +238,9 @@ class ThingsController {
     const form = this.#getTopLevelForm("writeallproperties");
     this.#logger.saveRequest(
       "writeAllProperties",
+      undefined,
       properties,
+      undefined,
       thingId,
       requestDate
     );
@@ -247,14 +257,16 @@ class ThingsController {
         const responseDate = Date.now().toString();
         this.#logger.saveResponse(
           "writeAllProperties",
-          ["Promise Resolved"],
+          undefined,
+          res.data,
+          undefined,
           thingId,
           requestDate,
           responseDate,
           true
         );
 
-        return { status: true, data: "Promise Resolved" };
+        return { status: true, data: res.data };
       })
       .catch((e) => {
         const responseDate = Date.now().toString();
@@ -313,7 +325,9 @@ class ThingsController {
     const form = this.#getTopLevelForm("writemultipleproperties");
     this.#logger.saveRequest(
       "writeMultipleProperties",
+      undefined,
       properties,
+      undefined,
       thingId,
       requestDate
     );
@@ -330,7 +344,9 @@ class ThingsController {
         const responseDate = Date.now().toString();
         this.#logger.saveResponse(
           "writeMultipleProperties",
-          ["Promise Resolved"],
+          undefined,
+          "Promise Resolved",
+          undefined,
           thingId,
           requestDate,
           responseDate,
@@ -342,7 +358,9 @@ class ThingsController {
         const responseDate = Date.now().toString();
         this.#logger.saveResponse(
           "writeMultipleProperties",
-          [e.toString()],
+          undefined,
+          message,
+          undefined,
           thingId,
           requestDate,
           responseDate,
@@ -351,61 +369,84 @@ class ThingsController {
         return { status: false, data: e.toString() };
       });
   }
-  async writeProperty(value) {
-    let propertyName = this.#currentProperty[0];
-    let uriVariable = this.#currentProperty[1]
-      ? this.#currentProperty[1]
-      : null;
-    let propertyForm = this.getPropertyTD(propertyName).forms[0];
+  async writeProperty(property, value, uriVariables) {
     const requestDate = Date.now().toString();
     const thingId = this.currentThingID;
     this.#logger.saveRequest(
       "writeProperty",
-      [propertyName, uriVariable, value],
+      property,
+      value,
+      uriVariables,
       thingId,
       requestDate
     );
-    // updateObj.thing.writeProperty(updateObj.property, value, uriVariables).then(v => console.log(v)).catch(e => {
-    //     console.log(e);
-    // });;
-    let url =
-      propertyForm.href.split("{?id}")[0] +
-      (uriVariable ? "?id=" + uriVariable : "");
-    let config = {
-      method: "put",
-      url,
-      headers: {
-        "Content-Type": propertyForm.contentType,
-      },
-      data: JSON.stringify(value),
-    };
-
-    return await axios(config)
+    return this.#currentThing
+      .writeProperty(property, value, { uriVariables })
       .then((response) => {
         const responseDate = Date.now().toString();
         this.#logger.saveResponse(
           "writeProperty",
+          property,
           response.data,
+          uriVariables,
           thingId,
           requestDate,
           responseDate,
           true
         );
-
         return { status: true, data: response.data };
       })
       .catch((error) => {
         const responseDate = Date.now().toString();
         this.#logger.saveResponse(
           "writeProperty",
-          error,
+          property,
+          error.message,
+          uriVariables,
           thingId,
           requestDate,
           responseDate,
           false
         );
-        return { status: false, data: error.data };
+        return { status: false, data: error.message };
       });
+    // let url =
+    //   propertyForm.href.split("{?id}")[0] +
+    //   (uriVariable ? "?id=" + uriVariable : "");
+    // let config = {
+    //   method: "put",
+    //   url,
+    //   headers: {
+    //     "Content-Type": propertyForm.contentType,
+    //   },
+    //   data: JSON.stringify(value),
+    // };
+
+    // return await axios(config)
+    //   .then((response) => {
+    //     const responseDate = Date.now().toString();
+    //     this.#logger.saveResponse(
+    //       "writeProperty",
+    //       response.data,
+    //       thingId,
+    //       requestDate,
+    //       responseDate,
+    //       true
+    //     );
+    //     return { status: true, data: response.data };
+    //   })
+    //   .catch((error) => {
+    //     const responseDate = Date.now().toString();
+    //     this.#logger.saveResponse(
+    //       "writeProperty",
+    //       error,
+    //       thingId,
+    //       requestDate,
+    //       responseDate,
+    //       false
+    //     );
+    //     return { status: false, data: error.data };
+    //   });
   }
   getPropertyDescription(property) {
     if (!this.hasCurrentThing) return null;
@@ -448,7 +489,9 @@ class ThingsController {
     let form = this.#getTopLevelForm("readallproperties");
     this.#logger.saveRequest(
       "readAllProperties",
-      ["readallproperties"],
+      undefined,
+      undefined,
+      undefined,
       thingId,
       requestDate
     );
@@ -464,7 +507,9 @@ class ThingsController {
         responseDate = Date.now().toString();
         this.#logger.saveResponse(
           "readAllProperties",
-          [res.data],
+          undefined,
+          res.data,
+          undefined,
           thingId,
           requestDate,
           responseDate,
@@ -476,7 +521,9 @@ class ThingsController {
         responseDate = Date.now().toString();
         this.#logger.saveResponse(
           "readAllProperties",
-          e.toString(),
+          undefined,
+          e.message,
+          undefined,
           thingId,
           requestDate,
           responseDate,
@@ -492,7 +539,9 @@ class ThingsController {
     let thingId = this.currentThingID;
     this.#logger.saveRequest(
       "readMultipleProperties",
+      undefined,
       propertyNames,
+      undefined,
       thingId,
       requestDate
     );
@@ -510,7 +559,9 @@ class ThingsController {
         responseDate = Date.now().toString();
         this.#logger.saveResponse(
           "readMultipleProperties",
-          [res.data],
+          undefined,
+          res.data,
+          undefined,
           thingId,
           requestDate,
           responseDate,
@@ -522,7 +573,9 @@ class ThingsController {
         responseDate = Date.now().toString();
         this.#logger.saveResponse(
           "readMultipleProperties",
+          undefined,
           e.toString(),
+          undefined,
           thingId,
           requestDate,
           responseDate,
@@ -531,29 +584,28 @@ class ThingsController {
         return e.toString();
       });
   }
-  async readProperty(property, uriVariable) {
-    this.#currentProperty = uriVariable ? [property, uriVariable] : [property];
+  async readProperty(property, uriVariables) {
     let payload = [property];
-    uriVariable && payload.push({ uriVariables: { id: uriVariable } });
     let requestDate = Date.now().toString();
     let responseDate;
     let thingId = this.currentThingID;
     this.#logger.saveRequest(
       "readProperty",
-      uriVariable ? [property, uriVariable] : [property],
+      property,
+      undefined,
+      uriVariables,
       thingId,
       requestDate
     );
     return this.#currentThing
-      .readProperty(...payload)
+      .readProperty(property, { uriVariables })
       .then((res) => {
         responseDate = Date.now().toString();
-        // if (things[currentThing.id].key.hasKey) {
-        //   login.showKey("green");
-        // }
         this.#logger.saveResponse(
           "readProperty",
-          [res],
+          property,
+          res,
+          uriVariables,
           thingId,
           requestDate,
           responseDate,
@@ -565,64 +617,53 @@ class ThingsController {
         responseDate = Date.now().toString();
         this.#logger.saveResponse(
           "readProperty",
-          error,
+          property,
+          error.message,
+          uriVariables,
           thingId,
           requestDate,
           responseDate,
           false
         );
-        // if (err.toString().includes("Unauthorized")) {
-        //   login.showKey("red");
-        // }
-        console.log(error);
-        return error;
+        return error.message;
       });
   }
 
-  async invokeAction(payload) {
+  async invokeAction(action, payload, uriVariables) {
     if (!this.hasCurrentThing) return null;
     const thingId = this.currentThingID;
     const requestDate = Date.now().toString();
-    const data =
-      payload.length > 2
-        ? [payload[0], { ...payload[2].uriVariables }]
-        : [
-            payload[0],
-            typeof payload[1] === "object" && payload[1].length === "undefined"
-              ? { ...payload[1] }
-              : payload[1],
-          ];
-    this.#logger.saveRequest("invokeAction", data, thingId, requestDate);
+    this.#logger.saveRequest(
+      "invokeAction",
+      action,
+      payload,
+      uriVariables,
+      thingId,
+      requestDate
+    );
     return await this.#currentThing
-      .invokeAction(...payload)
+      .invokeAction(action, payload, { uriVariables })
       .then((res) => {
-        // if (things[currentThing.id].key.hasKey) {
-        //   login.showKey("green");
-        // }
         const responseDate = Date.now().toString();
         this.#logger.saveResponse(
           "invokeAction",
-          [res],
+          action,
+          res,
+          uriVariables,
           thingId,
           requestDate,
           responseDate,
           true
         );
         return res;
-        // if (res) {
-        //   viewResponse(currentAction.action, res, {}, {});
-        // } else {
-        //   viewResponse(currentAction.action, "Executed successfully.", {}, {});
-        // }
       })
       .catch((error) => {
-        // if (err.toString().includes("Unauthorized")) {
-        //   login.showKey("red");
-        // }
         const responseDate = Date.now().toString();
         this.#logger.saveResponse(
           "invokeAction",
-          [error.message],
+          action,
+          error.message,
+          uriVariables,
           thingId,
           requestDate,
           responseDate,
@@ -630,7 +671,7 @@ class ThingsController {
         );
 
         return error.message;
-      }); //TypeError: e is undefined === no credentials
+      });
   }
   subscribeEvent(event) {
     if (!this.hasCurrentThing) return null;

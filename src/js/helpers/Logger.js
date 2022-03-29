@@ -23,20 +23,45 @@ class Logger {
       })
     );
   }
-  saveRequest(affordance, data, id, requestDate) {
+  saveRequest(
+    affordance,
+    interactionAffordance,
+    data,
+    uriVariables,
+    id,
+    requestDate
+  ) {
     const logs = JSON.parse(localStorage.getItem(id));
     const request = {
       date: requestDate,
+      interactionAffordance,
       data,
+      uriVariables,
       type: affordance,
     };
     logs[affordance][requestDate] = { request };
     localStorage.setItem(id, JSON.stringify(logs));
     this.#LogsViewer.appendRequestToView(logs.td.title, request);
   }
-  saveResponse(affordance, data, id, requestDate, responseDate, status) {
+  saveResponse(
+    affordance,
+    interactionAffordance,
+    data,
+    uriVariables,
+    id,
+    requestDate,
+    responseDate,
+    status
+  ) {
     const logs = JSON.parse(localStorage.getItem(id));
-    const response = { type: affordance, date: responseDate, status, data };
+    const response = {
+      type: affordance,
+      interactionAffordance,
+      date: responseDate,
+      uriVariables,
+      status,
+      data,
+    };
     logs[affordance][requestDate].response = { response };
     this.#LogsViewer.appendResponseToView(
       logs.td.title,
