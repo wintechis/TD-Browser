@@ -22,22 +22,24 @@
 #middleViewContainer,
 #rightViewContainer {
   background-color: map.get(colors.$theme-colors, "bg-secondary"); //move
-  padding: 20px 10px;
+  padding: 20px 0px;
   display: grid;
-  grid-template-rows: 50px auto;
+  grid-template-rows: 50px calc(100vh - 185px);
   grid-template-columns: 1fr;
 
   box-shadow: rgba(0, 0, 0, 0.4) 0px 2px 4px,
     rgba(0, 0, 0, 0.3) 0px 7px 13px -3px, rgba(0, 0, 0, 0.2) 0px -3px 0px inset; //move
   margin: 10px 10px;
   text-align: center; //move
-  border-radius: 15px; //move
+  border-radius: 6px; //move
   .body-row-1 {
+    padding: 0 5px;
   }
   .body-row-2 {
     background-color: map.get(colors.$theme-colors, "bg-primary"); //move
     padding: 10px;
-    border-radius: 15px; //move
+    border-top: 5px solid map.get(colors.$theme-colors, "bg-primary");
+    border-bottom: 5px solid map.get(colors.$theme-colors, "bg-primary");
   }
 }
 
@@ -67,7 +69,6 @@
     }
     .body-row-2 {
       height: auto;
-      border-radius: 0px; //move
     }
   }
 }

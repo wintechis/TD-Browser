@@ -6,7 +6,15 @@
     font-size: x-large;
     color: map.get(colors.$theme-colors, "secondary");
   }
+  #middleView-uriVariablesForm {
+    padding: 5px;
+    h1 {
+      text-align: center;
+    }
+  }
   #middleView-content {
+    overflow: auto;
+    position: relative;
     .btn-submit {
       display: block;
       background-color: map.get(colors.$theme-colors, "secondary");
@@ -15,14 +23,13 @@
       height: 40px;
       margin: 10px auto 0px auto;
     }
-    display: grid;
-    grid-template-rows: max-content auto;
     .card {
       background-color: map.get(colors.$theme-colors, "tertiary");
       text-align: left;
     }
     .bi-bullseye,
     .bi-pencil-fill,
+    .bi-eye-fill,
     .bi-info-circle-fill {
       color: map.get(colors.$theme-colors, "primary");
       cursor: pointer;
@@ -69,16 +76,17 @@
     .middleView-affordanceTitleContainer {
     }
     form {
-      height: calc(100vh - 305px);
+      border-top: 2px solid map.get(colors.$theme-colors, "primary");
       text-align: left;
+      margin-top: 10px;
+      padding-top: 5px;
       .middleView-inputsContainer {
         border-radius: 15px;
-        height: 100%;
         overflow: auto;
         padding: 0 5px 0 10px;
-        span {
-          margin-left: 4px;
-        }
+        // span {
+        //   margin-left: 4px;
+        // }
       }
       .nestedInputsContainer {
         border: 2px solid map.get(colors.$theme-colors, "primary");
@@ -177,9 +185,6 @@
         }
       }
     }
-    .JsonFormatter {
-      max-height: 57vh;
-    }
     #middleView-propertyForm-input {
       display: block;
       margin: 40px auto 20px;
@@ -241,6 +246,10 @@
       left: -9px;
     }
   }
+  .alert {
+    margin-top: 20px;
+    height: fit-content;
+  }
 }
 #middleView--refreshIcon {
   display: inline-block;
@@ -265,9 +274,7 @@
   color: map.get(colors.$theme-colors, "secondary");
   font-size: 22px;
   display: none;
-  // .middleView--backIcon-show {
-  //   display: inline;
-  // }
+  left: 15px;
 }
 #middleView-propertyForm {
   .textareaType-invalid {
@@ -292,9 +299,10 @@
 #middleView--unsubscribeEvent {
   color: map.get(colors.$theme-colors, "tertiary");
   text-align: center;
-  margin: 60px auto;
+  margin: 30px auto 0 auto;
   width: 110px;
   height: 40px;
+  display: block;
 }
 #middleView--subscribeEvent {
   background-color: green;

@@ -4,9 +4,7 @@
   .JsonFormatter {
     background-color: map.get(colors.$theme-colors, "tertiary");
     padding: 10px;
-    padding-right: 20px;
     margin-top: 15px;
-    margin: 20px;
     overflow: auto;
     font-size: large;
     text-align: left;
@@ -16,8 +14,18 @@
   }
 }
 .json-formatter-row {
-  span {
+  span,
+  a {
     overflow-wrap: break-word !important;
     white-space: normal !important;
+  }
+}
+#middleViewContainer,
+#rightViewContainer {
+  .JsonFormatter {
+    padding-top: 0;
+  }
+  .card-body > div:nth-child(1) > a:nth-child(1) {
+    display: none;
   }
 }
