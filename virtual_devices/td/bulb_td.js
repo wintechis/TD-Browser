@@ -49,11 +49,4 @@ module.exports = {
   //   },
   // },
   "@type": "Thing",
-  forms: [
-    {
-      href: "http://localhost:3001/bulb/all/properties",
-      contentType: "application/json",
-      op: ["writeallproperties", "writemultipleproperties"],
-    },
-  ],
 };

@@ -107,6 +107,7 @@ class RightView {
       `<div class=" ${
         response.status ? "" : "card-response-failed"
       } card card-response ${"card-response-" + request.type} ${
+        response.status &&
         ["observeProperty", "subscribeEvent"].includes(response.type)
           ? "card-response-notification"
           : ""

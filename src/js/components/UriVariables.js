@@ -1,5 +1,5 @@
 import $ from "jquery";
-import JSONFormatter from "json-formatter-js";
+import DescriptionElement from "./DescriptionElement";
 export default class UriVariables {
   static htmlElement(uriVariables) {
     return this.#generateForm(uriVariables);
@@ -55,7 +55,13 @@ const generateFields = (uriVariables) => {
       type: uriVariableType,
       enum: enumArray,
     } = uriVariables[uriVariable];
-    elements.push(descriptionElement(uriVariable, uriVariables[uriVariable]));
+    elements.push(
+      DescriptionElement(
+        "middleView-uriVariables-description-" + uriVariable,
+        uriVariable,
+        uriVariables[uriVariable]
+      )
+    );
     switch (uriVariableType) {
       case "integer":
         elements.push(
@@ -124,19 +130,4 @@ const stringInput = (uriVariable, enumArray) => {
       "String"
     )}" /> `;
   }
-};
-const descriptionElement = (id, description) => {
-  const element = $.parseHTML(
-    `<div>
-    <span data-bs-toggle="collapse" href="#middleView-uriVariables-description-${id}" role="button" aria-expanded="false" aria-controls="middleView-uriVariables-description-${id}">
-    <i class="bi-info-circle-fill"></i> ${id} 
-    </span>
-    <div class="collapse" id="middleView-uriVariables-description-${id}">
-        <div class="card card-body JsonFormatter"></div>
-    </div>
-   </div>`
-  );
-  const content = new JSONFormatter(description, 1).render();
-  $(element).find(".card-body").append(content);
-  return element;
 };

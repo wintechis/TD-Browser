@@ -93,7 +93,7 @@ class Controller {
     $("#controllerMetadata").trigger("click");
   }
   log() {
-    document.addEventListener("newEvent", () => {
+    document.addEventListener("newNotification", () => {
       if (!$("#controllerRightView").hasClass("btn-active")) {
         $("#controllerRightView").addClass("btn-orange");
       }

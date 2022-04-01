@@ -2,16 +2,27 @@
 import $ from "jquery";
 import JSONFormatter from "json-formatter-js";
 import UriVariables from "./UriVariables";
+import DescriptionElement from "./DescriptionElement";
 let observeIcon = `<i id="middleView--observeIcon" class="bi-eye-fill"> </i>`;
 let observeIconActive = `<i id="middleView--observeIcon" class="bi-eye-fill middleView--observeIcon--active"> </i>`;
 let refreshIcon = `<span id="middleView--refreshIcon"class="bi-arrow-clockwise"/>`;
 let editIcon = '<i id="middleView--editIcon" class="bi-pencil-fill"> </i>';
-let descriptionString = (id, description) =>
-  `<div class="collapse" id="middleView-description-${id}"><div class="card card-body">${description}</div></div>`;
+let descriptionString = (id, description) => {
+  const element = $.parseHTML(
+    `
+      <div class="collapse" id="middleView-description-${id}">
+          <div class="card card-body JsonFormatter"></div>
+      </div>
+    `
+  );
+  const content = new JSONFormatter(description, 1).render();
+  $(element).find(".card-body").append(content);
+  return element;
+};
 let infoIconElement = `<i class="bi-info-circle-fill"></i>`;
 let collapseSpanElement = (id, content) =>
   `<span data-bs-toggle="collapse" href="#middleView-description-${id}" role="button" aria-expanded="false" aria-controls="middleView-description-${id}">
-     ${content + " " + infoIconElement}
+     ${infoIconElement + " " + content}
   </span>`;
 let exclamationIcon = () => `<i class="bi-exclamation-diamond-fill"></i>`;
 const arrayValidator = () => {
@@ -66,7 +77,7 @@ class MiddleView {
   #currentRequestTime;
   #htmlElement = $.parseHTML(
     `
-    <div id="middleViewContainer" class="">
+    <div id="middleViewContainer" >
         <div id="middleView-title" class="body-row-1">
         </div>
         <div id="middleView-content" class="body-row-2">
@@ -102,7 +113,7 @@ class MiddleView {
       let elementID = e.target.id;
       switch (elementID) {
         case "middleView--observeIcon":
-          this.#tc.isPropertyObserved()
+          this.#tc.isPropertyObserved(this.#currentProperty)
             ? this.#unobserveProperty()
             : this.#observeProperty();
           break;
@@ -170,14 +181,31 @@ class MiddleView {
       }
     });
   }
-  #subscribeEvent() {
-    let thingTitle = this.#tc.currentThingTitle;
-    this.#tc.subscribeEvent(this.#currentEvent);
+  async #subscribeEvent() {
+    const thingTitle = this.#tc.currentThingTitle;
+    $("#middleView-content > .alert-danger").remove();
     $("#middleView--subscribeEvent").hide();
     $("#middleView--unsubscribeEvent").show();
+    const requestTime = Date.now();
+    this.#currentRequestTime = requestTime;
+    const response = await this.#tc.subscribeEvent(this.#currentEvent);
+    try {
+      if (
+        response.status === false &&
+        this.#currentRequestTime === requestTime
+      ) {
+        $("#middleView--subscribeEvent").show();
+        $("#middleView--unsubscribeEvent").hide();
+        const alertElement = $.parseHTML(
+          `<div class="alert alert-danger  fade show" role="alert"><strong>Failed to Subscribe</strong> <div>${response.data}</div></div>`
+        );
+        $("#middleView-content").append(alertElement);
+      }
+    } catch (error) {}
   }
   #unsubscribeEvent() {
     this.#tc.unsubscribeEvent(this.#currentEvent);
+    $("#middleView-content > .alert-danger").remove();
     $("#middleView--unsubscribeEvent").hide();
     $("#middleView--subscribeEvent").show();
   }
@@ -253,7 +281,7 @@ class MiddleView {
           inputsContainer,
           propertyObject.type,
           val,
-          propertyObject.description,
+          propertyObject,
           propertyObject.enum,
           propertyObject.minimum,
           propertyObject.maximum,
@@ -309,13 +337,16 @@ class MiddleView {
     required,
     unit
   ) {
-    let select = $.parseHTML(
+    const select = $.parseHTML(
       `<select name="${title}" id="${
         "middleView-formField-" + title
       }-select" class="form-select" aria-label="elect" ${
         required ? "required" : ""
       }></select> `
     );
+    const fieldContainer = $.parseHTML("<div></div>");
+    title !== undefined &&
+      $(fieldContainer).append(DescriptionElement(title, title, description));
     let placeholder;
     if (unit && typeof max === "number" && typeof min === "number") {
       placeholder = ` ${min} ${unit} to ${max} ${unit}`;
@@ -339,85 +370,48 @@ class MiddleView {
       enumArray.forEach((val) =>
         $(select).append(`<option  value="${val}" >${val}</option>`)
       );
-      $(formElement).append(
-        `<div class=""> 
-        ${title !== undefined ? collapseSpanElement(title, title) : ""}        
-        ${title !== undefined ? descriptionString(title, description) : ""}`,
-        select,
-        "</div>"
-      );
+      $(fieldContainer).append(select);
     } else if (type === "string") {
-      $(formElement).append(
-        `<div>
-          ${
-            title !== undefined ? collapseSpanElement(title, title) : ""
-          }        
-          ${title !== undefined ? descriptionString(title, description) : ""}
-          <input name="${title}" type="text" class="form-control" id="middleView-formField-${title}" ${
-          required ? "required" : ""
-        }></div>`
+      $(fieldContainer).append(
+        `<input name="${title}" type="text" class="form-control" id="middleView-formField-${title}" 
+        ${required ? "required" : ""}>`
       );
     } else if (type === "integer") {
-      $(formElement).append(
+      $(fieldContainer).append(
         $.parseHTML(
-          `<div class="">${
-            title !== undefined ? collapseSpanElement(title, title) : ""
-          }   
-            ${title !== undefined ? descriptionString(title, description) : ""}
-            <input type="number" class="form-control" step="1"  id="middleView-formField-${title}" min="${
-            min ? min : ""
-          }" max="${max ? max : ""}" ${
-            required ? "required" : ""
-          } placeholder="${placeholder ? placeholder : ""}"></div>`
+          `<input type="number" class="form-control" step="1"  id="middleView-formField-${title}" min=" 
+          ${min ? min : ""}" max="${max ? max : ""}"
+          ${required ? "required" : ""}
+           placeholder="${placeholder ? placeholder : ""}">`
         )
       );
     } else if (type === "number") {
-      $(formElement).append(
+      $(fieldContainer).append(
         $.parseHTML(
-          `<div class="">${
-            title !== undefined ? collapseSpanElement(title, title) : ""
-          }   
-            ${
-              title !== undefined && description !== undefined
-                ? descriptionString(title, description)
-                : ""
-            }
-            <input type="number" step="any" class="form-control " id="middleView-formField-${title}" min="${
+          `<input type="number" step="any" class="form-control " id="middleView-formField-${title}" min="${
             min ? min : ""
           }" max="${max ? max : ""}" ${
             required ? "required" : ""
-          } placeholder="${placeholder ? placeholder : ""}"></div>`
+          } placeholder="${placeholder ? placeholder : ""}">`
         )
       );
     } else if (type === "boolean") {
-      $(formElement).append(
+      $(fieldContainer).append(
         $.parseHTML(
-          `<div class=""> <div class="form-check form-switch"> 
-              ${title !== undefined ? collapseSpanElement(title, title) : ""}   
-              ${
-                title !== undefined ? descriptionString(title, description) : ""
-              }
-              <input name="${title}"  id="middleView-formField-${title}" class="form-check-input " value="true"  type="checkbox" checked>
-            </div>`
+          `<input name="${title}"  id="middleView-formField-${title}" class="form-check-input " value="true"  type="checkbox" checked>`
         )
       );
     } else if (type === "array") {
-      $(formElement).append(
+      $(fieldContainer).addClass("array-textarea-container");
+      $(fieldContainer).append(
         $.parseHTML(
-          `<div class="array-textarea-container">${
-            title !== undefined ? collapseSpanElement(title, title) : ""
-          }   
-            ${
-              title !== undefined && description !== undefined
-                ? descriptionString(title, description)
-                : ""
-            }
-            <div class="textareaType-invalid" data-toggle="tooltip" data-placement="top" style="display:none;">${exclamationIcon()}</div><textarea id="middleView-formField-${title}"  name="${title}" class="textarea-type-array" placeholder="Enter an array. Example:\n[ 1 , true , &quot;text&quot; ]" ${
+          `<div class="textareaType-invalid" data-toggle="tooltip" data-placement="top" style="display:none;">${exclamationIcon()}</div><textarea id="middleView-formField-${title}"  name="${title}" class="textarea-type-array" placeholder="Enter an array. Example:\n[ 1 , true , &quot;text&quot; ]" ${
             required ? "required" : ""
-          } data-bs-toggle="tooltip" data-bs-placement="top" title="Enter a value of type array!"></textarea></div>`
+          } data-bs-toggle="tooltip" data-bs-placement="top" title="Enter a value of type array!"></textarea>`
         )
       );
     }
+    $(formElement).append(fieldContainer);
   }
   #deleteForm() {
     $("#middleView-content > form").remove("");
@@ -462,10 +456,7 @@ class MiddleView {
       `<div class="middleView-affordanceTitleContainer"></div>`
     );
     $(affordanceTitleContainer).append(
-      $.parseHTML(
-        collapseSpanElement(actionName, actionName) +
-          descriptionString(actionName, actionObj.description)
-      )
+      DescriptionElement("title--" + actionName, actionName, actionObj)
     );
     $("#middleView--backIcon").remove();
     let backIcon = `<span id="middleView--backIcon" class="bi-arrow-left-circle-fill" ></span>`;
@@ -478,18 +469,29 @@ class MiddleView {
     );
     arrayValidator();
   }
-  #observeProperty() {
-    let thingTitle = this.#tc.currentThingTitle;
-    this.#tc.observeProperty();
+  async #observeProperty() {
     $(`#middleView--observeIcon `).addClass("middleView--observeIcon--active");
-    this.#LV.toggleObserveIcon(this.#tc.currentProperty[0]);
+    this.#LV.toggleObserveIcon(this.#currentProperty);
+    const requestTime = Date.now();
+    this.#currentRequestTime = requestTime;
+    const response = await this.#tc.observeProperty(this.#currentProperty);
+    if (response.status === false && this.#currentRequestTime === requestTime) {
+      $(`#middleView--observeIcon`).removeClass(
+        "middleView--observeIcon--active"
+      );
+      this.#LV.toggleObserveIcon(this.#currentProperty);
+      const alertElement = $.parseHTML(
+        `<div class="alert alert-danger  fade show" role="alert"><strong>Failed to Subscribe</strong><div>${response.data}</div></div>`
+      );
+      $("#middleView-content").append(alertElement);
+    }
   }
   #unobserveProperty() {
-    this.#tc.unobserveProperty();
+    this.#tc.unobserveProperty(this.#currentProperty);
     $(`#middleView--observeIcon`).removeClass(
       "middleView--observeIcon--active"
     );
-    this.#LV.toggleObserveIcon(this.#tc.currentProperty[0]);
+    this.#LV.toggleObserveIcon(this.#currentProperty);
   }
   #appendUpdatePropertyForm(properties, formType) {
     let isRequired = formType === "writeallproperties" ? true : false;
@@ -849,14 +851,14 @@ class MiddleView {
     let formatter = $.parseHTML(`<div class="JsonFormatter"></div>`);
     if (response.status) {
       alertElement =
-        $.parseHTML(`<div class="alert alert-success alert-dismissible fade show" role="alert"><strong>Property Updated</strong>
+        $.parseHTML(`<div class="alert alert-success  fade show" role="alert"><strong>${response.data}</strong>
        </div>`);
       // $(formatter).append(
       //   new JSONFormatter({ response: response.data }, 1).render()
       // );
     } else {
       alertElement = $.parseHTML(
-        `<div class="alert alert-danger alert-dismissible fade show" role="alert"><strong>Failed to Update</strong> <div>${response.data}</div></div>`
+        `<div class="alert alert-danger  fade show" role="alert"><strong>Failed to Update</strong> <div>${response.data}</div></div>`
       );
       // $(formatter).append(
       //   new JSONFormatter({ response: response.data }, 1).render()
@@ -890,8 +892,8 @@ class MiddleView {
       "writemultipleproperties",
     ].includes(property);
     let propertyDescription = isTopLevelForm
-      ? undefined
-      : this.#tc.getPropertyDescription(property);
+      ? this.#tc.getTopLevelFormTD(property)
+      : this.#tc.getPropertyTD(property);
     let title = property;
     let affordanceTitleContainer = $.parseHTML(
       `<div class="middleView-affordanceTitleContainer"></div>`
@@ -901,10 +903,13 @@ class MiddleView {
     !isTopLevelForm &&
       this.#tc.isPropertyObservable(property) &&
       $(collapseSpan).append(
-        this.#tc.isPropertyObserved() ? observeIconActive : observeIcon
+        this.#tc.isPropertyObserved(property) ? observeIconActive : observeIcon
       );
     if (property === "readallproperties") {
-      $(collapseSpan).append(refreshIcon);
+      $(collapseSpan).append(
+        refreshIcon,
+        descriptionString(property, propertyDescription)
+      );
       $(affordanceTitleContainer).append(collapseSpan);
       $("#middleView-content").append(affordanceTitleContainer);
       let RequestTime = Date.now();
@@ -916,6 +921,7 @@ class MiddleView {
         $("#middleView-content").append(formatter);
       }
     } else if (property === "readmultipleproperties") {
+      $(collapseSpan).append(descriptionString(property, propertyDescription));
       $(affordanceTitleContainer).append(collapseSpan);
       let readableProperties = this.#tc.getReadableProperties();
       let formElement = `<form id="middleView-readMultiplePropertiesForm" class="form-check"><div class="middleView-inputsContainer"> <label class="form-check-label selectAll-label"><input class="form-check-input selectAll-input" type="checkbox" > <span>Select All</span></label> ${readableProperties.reduce(
@@ -945,11 +951,13 @@ class MiddleView {
         }
       });
     } else if (property === "writeallproperties") {
+      $(collapseSpan).append(descriptionString(property, propertyDescription));
       $(affordanceTitleContainer).append(collapseSpan);
       $("#middleView-content").append(affordanceTitleContainer);
       let writableProperties = this.#tc.getWritableProperties();
       this.#appendUpdatePropertyForm(writableProperties, "writeallproperties");
     } else if (property === "writemultipleproperties") {
+      $(collapseSpan).append(descriptionString(property, propertyDescription));
       $(affordanceTitleContainer).append(collapseSpan);
       $("#middleView-content").append(affordanceTitleContainer);
       let writableProperties = this.#tc.getWritableProperties();
@@ -963,10 +971,8 @@ class MiddleView {
     ) {
       $(collapseSpan).append(refreshIcon);
       $(collapseSpan).append(editIcon);
-      $(affordanceTitleContainer).append(
-        collapseSpan,
-        descriptionString(property, propertyDescription)
-      );
+      $(collapseSpan).append(descriptionString(property, propertyDescription));
+      $(affordanceTitleContainer).append(collapseSpan);
       $("#middleView-content").append(affordanceTitleContainer);
       if (this.#tc.hasUriVariables("properties", property)) {
         this.#appendUriVariablesPropertyForm(property);
@@ -982,18 +988,14 @@ class MiddleView {
       }
     } else if (this.#tc.isPropertyWritable(property)) {
       $(collapseSpan).append(editIcon);
-      $(affordanceTitleContainer).append(
-        collapseSpan,
-        descriptionString(property, propertyDescription)
-      );
+      $(collapseSpan).append(descriptionString(property, propertyDescription));
+      $(affordanceTitleContainer).append(collapseSpan);
       $("#middleView-content").append(affordanceTitleContainer);
       this.#appendUpdatePropertyForm([property], "writeproperty");
     } else if (this.#tc.isPropertyReadable(property)) {
       $(collapseSpan).append(refreshIcon);
-      $(affordanceTitleContainer).append(
-        collapseSpan,
-        descriptionString(property, propertyDescription)
-      );
+      $(collapseSpan).append(descriptionString(property, propertyDescription));
+      $(affordanceTitleContainer).append(collapseSpan);
       $("#middleView-content").append(affordanceTitleContainer);
       if (this.#tc.hasUriVariables("properties", property)) {
         this.#appendUriVariablesPropertyForm(property);
@@ -1022,8 +1024,8 @@ class MiddleView {
       const formElement = $.parseHTML(
         `<form id="middleView-uriVariablesPropertyForm"></form>`
       );
-      $(formElement).append(uriVariablesForm, submitButtonElement);
-      $("#middleView-content").append(formElement);
+      $(formElement).append(submitButtonElement);
+      $("#middleView-content").append(uriVariablesForm, formElement);
     }
   }
   async #handelUriVariablesPropertyForm(e, uriVariables) {
@@ -1040,11 +1042,10 @@ class MiddleView {
   appendEvent(event) {
     this.resetMiddleView();
     this.#currentEvent = event;
-    let eventDescription = this.#tc.getEventDescription(event);
+    let eventDescription = this.#tc.getEventTD(event);
     let buttonsElement = `<button id="middleView--unsubscribeEvent" class="btn">Unsubscribe</button> <button id="middleView--subscribeEvent" class="btn">Subscribe</button>`;
     $("#middleView-content").append(
-      collapseSpanElement(event, event),
-      descriptionString(event, eventDescription),
+      DescriptionElement(event, event, eventDescription),
       buttonsElement
     );
     !this.#tc.isEventSubscribed(event)

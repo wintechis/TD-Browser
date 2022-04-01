@@ -1,7 +1,7 @@
 "use strict";
 import "@node-wot/browser-bundle";
 import axios from "axios";
-const newEvent = new Event("newEvent");
+const newNotification = new Event("newNotification");
 class ThingsController {
   #things = {};
   #currentProperty = [];
@@ -170,6 +170,20 @@ class ThingsController {
     if (!this.hasCurrentThing) return null;
     return this.getPropertiesTD()[property];
   }
+  getTopLevelFormTD(property) {
+    if (!this.hasCurrentThing) return null;
+    const forms = this.#getTD()["forms"];
+    if (forms.length) {
+      return { ...forms };
+    } else {
+      for (const iterator of forms) {
+        if (iterator.op === property) {
+          return { ...property };
+        }
+      }
+    }
+  }
+
   getToplevelForms() {
     if (!this.hasCurrentThing) return null;
     let td = this.#getTD();
@@ -185,50 +199,90 @@ class ThingsController {
     return this.getEventsTD()[event];
   }
 
-  observeProperty() {
-    const propertyName = this.#currentProperty[0];
+  observeProperty(property) {
     const thing = this.#currentThing;
     const requestDate = Date.now().toString();
     const thingId = this.currentThingID;
     this.#logger.saveRequest(
       "observeProperty",
-      [propertyName],
+      property,
+      undefined,
+      undefined,
       thingId,
       requestDate
     );
-    thing.observeProperty(propertyName, (data) => {
-      const responseDate = Date.now().toString();
-      this.#logger.saveResponse(
-        "observeProperty",
-        [data],
-        thingId,
-        requestDate,
-        responseDate,
-        true
-      );
-    });
-    !this.#observedProperties[thing.id].includes(propertyName) &&
-      this.#observedProperties[thing.id].push(propertyName);
-    // things[currentThing.id].observedProperties[observeObj.property] = true;
-    // $(
-    //   `#observeIconWithEvent,#${currentThing.id}-property-${observeObj.property} .material-icons:last-child`
-    // ).addClass("observeIconGreen");
-    // return true;
+    !this.#observedProperties[thing.id].includes(property) &&
+      this.#observedProperties[thing.id].push(property);
+    return thing
+      .observeProperty(
+        property,
+        (response) => {
+          const responseDate = Date.now().toString();
+          this.#logger.saveResponse(
+            "observeProperty",
+            property,
+            response,
+            undefined,
+            thingId,
+            requestDate,
+            responseDate,
+            true
+          );
+          document.dispatchEvent(newNotification);
+        },
+        (error) => {
+          const index = this.#observedProperties[thing.id].indexOf(property);
+          if (index > -1) {
+            this.#observedProperties[thing.id].splice(index, 1);
+            const responseDate = Date.now().toString();
+            this.#logger.saveResponse(
+              "observeProperty",
+              property,
+              error.message,
+              undefined,
+              thingId,
+              requestDate,
+              responseDate,
+              false
+            );
+            return { status: false, data: error.message };
+          }
+        }
+      )
+      .catch((error) => {
+        const index = this.#observedProperties[thing.id].indexOf(property);
+        if (index > -1) {
+          this.#observedProperties[thing.id].splice(index, 1);
+          const responseDate = Date.now().toString();
+          this.#logger.saveResponse(
+            "observeProperty",
+            property,
+            error.message,
+            undefined,
+            thingId,
+            requestDate,
+            responseDate,
+            false
+          );
+          return { status: false, data: error.message };
+        }
+      });
   }
-  async unobserveProperty() {
-    const propertyName = this.#currentProperty[0];
+  async unobserveProperty(property) {
     const requestDate = Date.now().toString();
     const thingId = this.currentThingID;
     const thing = this.#currentThing;
-    if (this.isPropertyObserved(propertyName)) {
+    if (this.isPropertyObserved(property)) {
       this.#logger.saveRequest(
         "unobserveProperty",
-        [propertyName],
+        property,
+        undefined,
+        undefined,
         thingId,
         requestDate
       );
-      await thing.unobserveProperty(propertyName);
-      const index = this.#observedProperties[thing.id].indexOf(propertyName);
+      await thing.unobserveProperty(property);
+      const index = this.#observedProperties[thing.id].indexOf(property);
       if (index > -1) this.#observedProperties[thing.id].splice(index, 1);
     }
   }
@@ -265,8 +319,6 @@ class ThingsController {
           responseDate,
           true
         );
-
-        return { status: true, data: res.data };
       })
       .catch((e) => {
         const responseDate = Date.now().toString();
@@ -382,19 +434,19 @@ class ThingsController {
     );
     return this.#currentThing
       .writeProperty(property, value, { uriVariables })
-      .then((response) => {
+      .then(() => {
         const responseDate = Date.now().toString();
         this.#logger.saveResponse(
           "writeProperty",
           property,
-          response.data,
+          undefined,
           uriVariables,
           thingId,
           requestDate,
           responseDate,
           true
         );
-        return { status: true, data: response.data };
+        return { status: true, data: "The Property Was Successfully Updated." };
       })
       .catch((error) => {
         const responseDate = Date.now().toString();
@@ -678,106 +730,101 @@ class ThingsController {
     const thingId = this.currentThingID;
     this.#subscribedEvents[thingId].push(event);
     const requestDate = Date.now().toString();
-    try {
-      this.#logger.saveRequest("subscribeEvent", [event], thingId, requestDate);
-      this.#currentThing.subscribeEvent(
+    this.#logger.saveRequest(
+      "subscribeEvent",
+      event,
+      undefined,
+      undefined,
+      thingId,
+      requestDate
+    );
+    return this.#currentThing
+      .subscribeEvent(
         event,
         (response) => {
           const responseDate = Date.now().toString();
           this.#logger.saveResponse(
             "subscribeEvent",
-            [response],
+            event,
+            response,
+            undefined,
             thingId,
             requestDate,
             responseDate,
             true
           );
-          document.dispatchEvent(newEvent);
+          document.dispatchEvent(newNotification);
         },
-        (err) => {
+        (error) => {
+          const index = this.#subscribedEvents[thingId].indexOf(event);
+          if (index > -1) {
+            this.#subscribedEvents[thingId].splice(index, 1);
+            const responseDate = Date.now().toString();
+            this.#logger.saveResponse(
+              "subscribeEvent",
+              event,
+              error.message,
+              undefined,
+              thingId,
+              requestDate,
+              responseDate,
+              false
+            );
+          }
+        }
+      )
+      .catch((error) => {
+        const index = this.#subscribedEvents[thingId].indexOf(event);
+        if (index > -1) {
+          this.#subscribedEvents[thingId].splice(index, 1);
           const responseDate = Date.now().toString();
           this.#logger.saveResponse(
             "subscribeEvent",
-            [err],
+            event,
+            error.message,
+            undefined,
             thingId,
             requestDate,
             responseDate,
             false
           );
-
-          throw new Error(" Event " + event + " error\nMessage: " + error);
+          return { status: false, data: error.message };
         }
-      );
-    } catch (err) {
-      const index = this.#subscribedEvents[thingId].indexOf(event);
-      if (index > -1) this.#subscribedEvents[thingId].splice(index, 1);
-    }
-    // return await this.#currentThing
-    //   .invokeAction(...payload)
-    //   .then((res) => {
-    //     // if (things[currentThing.id].key.hasKey) {
-    //     //   login.showKey("green");
-    //     // }
-    //     return res;
-    //     // if (res) {
-    //     //   viewResponse(currentAction.action, res, {}, {});
-    //     // } else {
-    //     //   viewResponse(currentAction.action, "Executed successfully.", {}, {});
-    //     // }
-    //   })
-    //   .catch((error) => {
-    //     // if (err.toString().includes("Unauthorized")) {
-    //     //   login.showKey("red");
-    //     // }
-    //     return error;
-    //   }); //TypeError: e is undefined === no credentials
+      });
   }
   unsubscribeEvent(event) {
     if (!this.hasCurrentThing) return null;
     const thingId = this.currentThingID;
-    this.#subscribedEvents[thingId].push(event);
     const requestDate = Date.now().toString();
-    try {
-      const index = this.#subscribedEvents[thingId].indexOf(event);
-      if (index > -1) this.#subscribedEvents[thingId].splice(index, 1);
-      this.#logger.saveRequest(
-        "unsubscribeEvent",
-        [event],
-        thingId,
-        requestDate
-      );
-      this.#currentThing.unsubscribeEvent(
-        event,
-        (response) => {
-          const responseDate = Date.now().toString();
-          this.#logger.saveResponse(
-            "unsubscribeEvent",
-            [response],
-            thingId,
-            requestDate,
-            responseDate,
-            true
-          );
-        },
-        (error) => {
-          const responseDate = Date.now().toString();
-          this.#logger.saveResponse(
-            "unsubscribeEvent",
-            [response],
-            thingId,
-            requestDate,
-            responseDate,
-            false
-          );
-          throw new Error(
-            " unsubscribeEvent %%%%%%%%%%%%% Event " +
-              event +
-              " error\nMessage: " +
-              error
-          );
-        }
-      );
-    } catch (error) {}
+    const index = this.#subscribedEvents[thingId].indexOf(event);
+    if (index > -1) this.#subscribedEvents[thingId].splice(index, 1);
+    this.#logger.saveRequest(
+      "unsubscribeEvent",
+      event,
+      undefined,
+      undefined,
+      thingId,
+      requestDate
+    );
+    this.#currentThing.unsubscribeEvent(
+      event,
+      () => {
+        const responseDate = Date.now().toString();
+        this.#logger.saveResponse(
+          "unsubscribeEvent",
+          event,
+          undefined,
+          undefined,
+          thingId,
+          requestDate,
+          responseDate,
+          true
+        );
+      },
+      (error) => {
+        console.log(error);
+      }
+    );
     // return await this.#currentThing
     //   .invokeAction(...payload)
     //   .then((res) => {
