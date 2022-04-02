@@ -54,6 +54,7 @@ module.exports = (io) => {
       `${property.current_box} box was dropped`
     );
     property.current_box = "none";
+    res.end();
   });
   Router.post("/mirobot/actions/pick_box", express.text(), (req, res) => {
     const boxesEnum = ["red", "green", "blue", "yellow"];
@@ -84,9 +85,9 @@ module.exports = (io) => {
       `/mirobot/properties/holding_box/observeproperty`,
       property.holding_box
     );
-
     box !== "none" &&
       longpoll.publish(`/mirobot/events/${box}_box`, `${box} box was picked`);
+    res.end();
   });
   return Router;
 };
