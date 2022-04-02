@@ -481,7 +481,7 @@ class MiddleView {
       );
       this.#LV.toggleObserveIcon(this.#currentProperty);
       const alertElement = $.parseHTML(
-        `<div class="alert alert-danger  fade show" role="alert"><strong>Failed to Subscribe</strong><div>${response.data}</div></div>`
+        `<div class="alert alert-danger  fade show" role="alert"><strong>Failed to Observe</strong><div>${response.data}</div></div>`
       );
       $("#middleView-content").append(alertElement);
     }
@@ -523,7 +523,7 @@ class MiddleView {
     let integerInput = (property, indx, isRequired, unit, min, max) =>
       `<label><span>${
         property.includes("nestedProperty") ? property.split("--")[2] : property
-      }</span><input type="number" placeholder="${tooltip(
+      }</span><input type="number" class="form-control" placeholder="${tooltip(
         "Integer",
         unit,
         max,
@@ -539,7 +539,7 @@ class MiddleView {
     let numberInput = (property, indx, isRequired, unit, min, max) =>
       `<label><span>${
         property.includes("nestedProperty") ? property.split("--")[2] : property
-      }</span> <input placeholder="${tooltip(
+      }</span> <input class="form-control" placeholder="${tooltip(
         "number",
         unit,
         max,
@@ -572,7 +572,7 @@ class MiddleView {
           property.includes("nestedProperty")
             ? property.split("--")[2]
             : property
-        }</span> <input type="text" placeholder="Enter a string without quotation marks" ${
+        }</span> <input class="form-control" type="text" placeholder="Enter a string without quotation marks" ${
           isRequired ? "required" : ""
         } name="${property}--string"  id="middleView-propertyForm-input-${indx}" data-bs-toggle="tooltip" data-bs-placement="top" title="${tooltip(
           "String"
