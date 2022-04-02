@@ -159,7 +159,6 @@ class LeftView {
       ...this.#tc.getToplevelForms(),
       ...this.#tc.getPropertiesTD(),
     };
-    console.log(properties);
     let listGroupElement = $.parseHTML(`<div class="list-group"></div>`);
     Object.keys(properties).forEach((property) => {
       let observable = properties[property].observable;
