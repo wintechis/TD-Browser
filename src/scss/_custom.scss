@@ -6,3 +6,17 @@
 .collapse {
   transition: none;
 }
+.form-control,
+.form-select {
+  height: 25px;
+  padding: 0 1px;
+}
+.form-select {
+  font-size: 1rem;
+}
+.form-check-input {
+  margin: 3px 2px 2px;
+  vertical-align: baseline;
+  height: 13px;
+  width: 13px;
+}
