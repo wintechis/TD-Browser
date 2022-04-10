@@ -1,4 +1,32 @@
-"use strict";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: ThingsController.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: ThingsController.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>"use strict";
 import "@node-wot/browser-bundle";
 import axios from "axios";
 const newNotification = new Event("newNotification");
@@ -11,10 +39,10 @@ const newNotification = new Event("newNotification");
  * @type {object}
  * @constructor
  * @public
- * @property {object.<ConsumedThing>} things - The property is the ConsumedThing id and the value is the ConsumedThing.
- * @property {?object.<ConsumedThing>} currentThing - The current consumed thing which is the thing that will be used by the methods.
- * @property {object.<string[]>} observedProperties - Contains all the observed properties where the key is the thing id and the value is all the observed properties.
- * @property {object.<string[]>} subscribedEvents -  Contains all the subscribed event where the key is the thing id and the value is all the subscribed event.
+ * @property {object.&lt;ConsumedThing>} things - The property is the ConsumedThing id and the value is the ConsumedThing.
+ * @property {?object.&lt;ConsumedThing>} currentThing - The current consumed thing which is the thing that will be used by the methods.
+ * @property {object.&lt;string[]>} observedProperties - Contains all the observed properties where the key is the thing id and the value is all the observed properties.
+ * @property {object.&lt;string[]>} subscribedEvents -  Contains all the subscribed event where the key is the thing id and the value is all the subscribed event.
  */
 class ThingsController {
   /**
@@ -84,7 +112,7 @@ class ThingsController {
    */
   hasSecurity() {
     let security = this.#currentThing.security;
-    if (typeof security === "object" && security.length > 0) {
+    if (typeof security === "object" &amp;&amp; security.length > 0) {
       return security[0] === "nosec_sc" ? false : true;
     } else if (typeof security === "string") {
       return security === "nosec_sc" ? false : true;
@@ -136,7 +164,7 @@ class ThingsController {
    */
   securityType() {
     let security = this.#currentThing.security;
-    if (typeof security === "object" && security.length > 0) {
+    if (typeof security === "object" &amp;&amp; security.length > 0) {
       return security[0];
     } else if (typeof security === "string") {
       return security;
@@ -345,7 +373,7 @@ class ThingsController {
   /**
    * @type {Function}
    * @param {string} property - The property interaction affordance.
-   * @returns {object.<status:boolean,data:string>}
+   * @returns {object.&lt;status:boolean,data:string>}
    */
   observeProperty(property) {
     const thing = this.#currentThing;
@@ -359,7 +387,7 @@ class ThingsController {
       thingId,
       requestDate
     );
-    !this.#observedProperties[thing.id].includes(property) &&
+    !this.#observedProperties[thing.id].includes(property) &amp;&amp;
       this.#observedProperties[thing.id].push(property);
     return thing
       .observeProperty(
@@ -441,7 +469,7 @@ class ThingsController {
   /**
    * @type {Function}
    * @param {string[]} properties - All properties.
-   * @returns {object.<status:boolean,data:string>}
+   * @returns {object.&lt;status:boolean,data:string>}
    */
   async writeAllProperties(properties) {
     const requestDate = Date.now().toString();
@@ -493,7 +521,7 @@ class ThingsController {
   /**
    * @type {Function}
    * @param {string[]} properties
-   * @returns {object.<status:boolean,data:string>}
+   * @returns {object.&lt;status:boolean,data:string>}
    */
   async writeMultipleProperties(properties) {
     const requestDate = Date.now().toString();
@@ -550,7 +578,7 @@ class ThingsController {
    * @param {string} property
    * @param {*} value
    * @param {object} uriVariables
-   * @returns {object.<status:boolean,data:string>}
+   * @returns {object.&lt;status:boolean,data:string>}
    */
   async writeProperty(property, value, uriVariables) {
     const requestDate = Date.now().toString();
@@ -636,7 +664,7 @@ class ThingsController {
    * Get the url,httpMethod and contentType for a top level Form.
    * @type {Function}
    * @param {"readallproperties"|"readmultipleproperties"|"writeallproperties"|"writemultipleproperties"} method - The top level form type
-   * @returns {object.<url:string,httpMethod:url,contentType:string>}
+   * @returns {object.&lt;url:string,httpMethod:url,contentType:string>}
    * @private
    */
   #getTopLevelForm(method) {
@@ -995,7 +1023,7 @@ class ThingsController {
     ];
     let td = this.#getTD();
     let metadata = enumString.reduce((accumulator, currentValue) => {
-      if (td[currentValue] !== undefined && enumString.includes(currentValue)) {
+      if (td[currentValue] !== undefined &amp;&amp; enumString.includes(currentValue)) {
         accumulator.push([currentValue, td[currentValue]]);
       }
       return accumulator;
@@ -1022,3 +1050,26 @@ class ThingsController {
 }
 
 export default ThingsController;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="ThingsController.html">ThingsController</a></li></ul><h3><a href="global.html">Global</a></h3>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.10</a> on Sun Apr 10 2022 09:12:35 GMT+0200 (Central European Summer Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
