@@ -470,16 +470,17 @@ class MiddleView {
     arrayValidator();
   }
   async #observeProperty() {
+    const property = this.#currentProperty;
     $(`#middleView--observeIcon `).addClass("middleView--observeIcon--active");
-    this.#LV.toggleObserveIcon(this.#currentProperty);
+    this.#LV.toggleObserveIcon();
     const requestTime = Date.now();
     this.#currentRequestTime = requestTime;
-    const response = await this.#tc.observeProperty(this.#currentProperty);
+    const response = await this.#tc.observeProperty(property);
     if (response.status === false && this.#currentRequestTime === requestTime) {
       $(`#middleView--observeIcon`).removeClass(
         "middleView--observeIcon--active"
       );
-      this.#LV.toggleObserveIcon(this.#currentProperty);
+      this.#LV.toggleObserveIcon(property);
       const alertElement = $.parseHTML(
         `<div class="alert alert-danger  fade show" role="alert"><strong>Failed to Observe</strong><div>${response.data}</div></div>`
       );
@@ -491,7 +492,7 @@ class MiddleView {
     $(`#middleView--observeIcon`).removeClass(
       "middleView--observeIcon--active"
     );
-    this.#LV.toggleObserveIcon(this.#currentProperty);
+    this.#LV.toggleObserveIcon(property);
   }
   #appendUpdatePropertyForm(properties, formType) {
     let isRequired = formType === "writeallproperties" ? true : false;
@@ -597,16 +598,15 @@ class MiddleView {
     <option value="true">True</option>
     <option value="false">False</option>
     </select></label>`;
-    let propertiesOfTypeObject = [];
+    const propertiesOfTypeObject = [];
     properties.forEach((property, indx) => {
-      let {
+      const {
         unit,
-        min,
-        max,
+        minimum: min,
+        maximum: max,
         type: propertyType,
         enum: enumArray,
       } = propertiesTD[property];
-
       switch (propertyType) {
         case "integer":
           inputElements += integerInput(
@@ -648,10 +648,10 @@ class MiddleView {
       let nestedInputElements = `<div class="nestedInputsContainer"  id="middleView-propertyForm-nestedInputsContainer-${property}"> <div class="header header-active">${property}</div>`;
       Object.keys(propertiesTD[property]["properties"]).forEach(
         (nestedProperty, indx) => {
-          let {
+          const {
             unit,
-            min,
-            max,
+            minimum: min,
+            maximum: max,
             type: propertyType,
           } = propertiesTD[property]["properties"][nestedProperty];
           switch (propertyType) {
