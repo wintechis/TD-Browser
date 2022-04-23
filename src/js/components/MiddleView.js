@@ -495,7 +495,10 @@ class MiddleView {
     this.#LV.toggleObserveIcon(property);
   }
   #appendUpdatePropertyForm(properties, formType) {
-    let isRequired = formType === "writeallproperties" ? true : false;
+    let isRequired =
+      formType === "writeallproperties" || formType === "writeproperty"
+        ? true
+        : false;
     let inputElements = "";
     let propertiesTD = this.#tc.getPropertiesTD();
     let tooltip = (type, unit, min, max) => {
@@ -531,7 +534,7 @@ class MiddleView {
         min
       )}" ${
         isRequired ? "required" : ""
-      } name="${property}--integer" id="middleView-propertyForm-input-${indx}" step="1" data-bs-toggle="tooltip" data-bs-placement="top" title="${tooltip(
+      } name="${property}--integer" id="middleView-propertyForm-input-${indx}" min="${min}" max="${max}" step="1" data-bs-toggle="tooltip" data-bs-placement="top" title="${tooltip(
         "Integer",
         unit,
         max,
@@ -547,7 +550,7 @@ class MiddleView {
         min
       )}" type="number" ${
         isRequired ? "required" : ""
-      } name="${property}--number"  id="middleView-propertyForm-input-${indx}" data-bs-toggle="tooltip" data-bs-placement="top" title="${tooltip(
+      } name="${property}--number"  min="${min}" max="${max}" id="middleView-propertyForm-input-${indx}" data-bs-toggle="tooltip" data-bs-placement="top" title="${tooltip(
         "number",
         unit,
         max,
@@ -654,6 +657,16 @@ class MiddleView {
             maximum: max,
             type: propertyType,
           } = propertiesTD[property]["properties"][nestedProperty];
+          if (formType === "writeproperty") {
+            const required = propertiesTD[property]["properties"]["required"];
+
+            isRequired =
+              typeof required === "object" &&
+              required.length &&
+              required.includes(nestedProperty)
+                ? true
+                : false;
+          }
           switch (propertyType) {
             case "integer":
               nestedInputElements += integerInput(
