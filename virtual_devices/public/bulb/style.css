@@ -13,8 +13,8 @@ body {
   top: 40%;
 }
 
-div,
-span {
+#bulb-div,
+#bulb-span {
   position: absolute;
   appearance: none;
   -moz-appearance: none;
@@ -25,16 +25,13 @@ span {
   left: 50%;
   top: 40%;
   transform: translate(-50%, -50%);
-  box-shadow: 0 0 0px 10px white;
-  background: white;
-  transition: all 0.5s ease-in-out;
 }
 
-div::before {
+#bulb-div::before {
   position: absolute;
   content: "";
   width: 95px;
-  border-top: 60px solid white;
+  border-top: 60px solid grey;
   border-left: 30px solid transparent;
   border-right: 30px solid transparent;
   left: -2px;
@@ -42,7 +39,7 @@ div::before {
   transition: all 0.5s ease-in-out;
 }
 
-div::after {
+#bulb-div::after {
   position: absolute;
   content: "";
   width: 70px;
@@ -69,20 +66,58 @@ body::before {
   z-index: 1;
 }
 
-span,
-span:focus {
+#bulb-span,
+#bulb-span:focus {
   z-index: 1;
   outline: unset;
   border: none;
 }
-
+#bulb-div,
+.off {
+  box-shadow: 0 0 0px 10px grey;
+  background: grey;
+  transition: all 0.5s ease-in-out;
+}
 .on {
   background: var(--color);
-  box-shadow: 0 0 0 10px var(--color), 0 0 150px 10px var(--color);
+  box-shadow: 0 0 0 10px var(--color), 0 0 150px 50px var(--color);
   transition: all 0.5s ease-in-out;
 }
 
-.on + div::before {
+.on + #bulb-div::before {
   border-top-color: var(--color);
   transition: all 0.5s ease-in-out;
+}
+
+a.power-button {
+  cursor: pointer;
+  position: absolute;
+  top: 195px;
+  right: -27px;
+  width: 50px;
+  height: 50px;
+  font-size: 8em;
+  border: 2px solid #dedede;
+  background-color: #efefef;
+  box-shadow: 0px 0px 40px 1px #ddd inset, 0px 2px 4px rgba(0, 0, 0, 0.4),
+    1px 1px 4px rgba(0, 0, 0, 0.3), -1px -1px 2px rgba(0, 0, 0, 0.1),
+    -1px 1px 2px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  margin: auto;
+  border-radius: 50%;
+  transition: color 0.8s;
+  transition-timing-function: cubic-bezier(0, 1, 0.5, 1);
+}
+.power-button:hover {
+  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.4), 1px 1px 6px rgba(0, 0, 0, 0.3),
+    -1px -1px 4px rgba(0, 0, 0, 0.1), -1px 1px 4px rgba(0, 0, 0, 0.1);
+}
+.power-button.on {
+  color: #89ceee;
+}
+.fa {
+  font-size: 50px;
+  position: absolute;
+  top: 2px;
+  right: 3px;
 }

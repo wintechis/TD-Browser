@@ -112,12 +112,11 @@ module.exports = (port) => {
       },
     },
     events: {
-      overheating: {
-        description:
-          "fire the event when the bulb is on for more than four hours",
+      power_on: {
+        description: "fire the event when the power is back on",
         forms: [
           {
-            href: "/bulb/events/overheating",
+            href: "/bulb/events/power_on",
             contentType: "application/json",
             subprotocol: "longpoll",
             op: ["subscribeevent", "unsubscribeevent"],

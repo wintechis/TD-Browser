@@ -7,8 +7,8 @@ const default_value = {
   color: { red: 249, green: 246, blue: 231 },
   room: { value: "" },
 };
-let timeoutID;
-const responses = { color: {}, room: {}, overheating: {} };
+let power = true;
+const responses = { color: {}, room: {}, power_on: {} };
 const bulb = {
   status: { ...default_value.status },
   color: { ...default_value.color },
@@ -18,20 +18,33 @@ module.exports = (io, port) => {
   const td = require("../td/bulb_td")(port);
   const bulbWebSocket = io.of("/client/bulb");
   bulbWebSocket.on("connection", async (socket) => {
-    bulbWebSocket.to(socket.id).emit("status", bulb.status.value, bulb.color);
+    bulbWebSocket
+      .to(socket.id)
+      .emit("status", bulb.status.value, bulb.color, power);
+    bulbWebSocket.to(socket.id).emit("initialPower", power, bulb.status);
+    socket.on("updatePower", () => {
+      power = !power;
+      socket.broadcast.emit("updatePower", power);
+      if (power) {
+        Object.keys(responses.power_on).forEach((key) => {
+          responses.power_on[key].json("Power is back on");
+          responses.power_on[key].end();
+        });
+      }
+    });
   });
   Router.get("/bulb", (req, res) => res.json(td));
   Router.get("/client/bulb", (req, res) => {
     res.sendFile(path.resolve(__dirname + "/../public/bulb/index.html"));
   });
-  Router.get("/bulb/properties/status", (req, res) => {
+  Router.get("/bulb/properties/status", powerMiddleware, (req, res) => {
     res.send({ ...bulb.status });
   });
-  Router.get("/bulb/properties/color", (req, res) => {
+  Router.get("/bulb/properties/color", powerMiddleware, (req, res) => {
     res.status(200);
     res.json(bulb.color);
   });
-  Router.put("/bulb/properties/color", (req, res) => {
+  Router.put("/bulb/properties/color", powerMiddleware, (req, res) => {
     const { red, blue, green } = req.body;
     if (
       0 <= red &&
@@ -42,7 +55,7 @@ module.exports = (io, port) => {
       blue <= 255
     ) {
       bulb.color = { red, blue, green };
-      bulbWebSocket.emit("status", bulb.status.value, bulb.color);
+      bulbWebSocket.emit("status", bulb.status.value, bulb.color, power);
       res.status(200).end();
       Object.keys(responses.color).forEach((key) => {
         responses.color[key].send(bulb.room.value);
@@ -83,39 +96,33 @@ module.exports = (io, port) => {
     responses.room[id] = res;
     req.on("end", () => delete responses.room[id]);
   });
-  Router.post("/bulb/actions/toggle", (req, res) => {
-    bulb.status.value = bulb.status.value === "off" ? "on" : "Off";
-    if (bulb.status.value === "on") {
-      overheating();
-    } else {
-      clearTimeout(timeoutID);
-    }
-    bulbWebSocket.emit("status", bulb.status.value, bulb.color);
-    res.json({});
+  Router.post("/bulb/actions/toggle", powerMiddleware, (req, res) => {
+    bulb.status.value = bulb.status.value === "off" ? "on" : "off";
+    bulbWebSocket.emit("status", bulb.status.value, bulb.color, power);
+    res.end();
   });
-  Router.post("/bulb/actions/reset", (req, res) => {
+  Router.post("/bulb/actions/reset", powerMiddleware, (req, res) => {
     bulb.color = { ...default_value.color };
     bulb.room = { ...default_value.room };
-    bulbWebSocket.emit("status", bulb.status.value, bulb.color);
-    res.json();
+    bulbWebSocket.emit("status", bulb.status.value, bulb.color, power);
+    res.end();
   });
-  Router.get("/bulb/events/overheating", (req, res) => {
+  Router.get("/bulb/events/power_on", (req, res) => {
     const id = uuid_generator();
-    responses.overheating[id] = res;
-    req.on("end", () => delete responses.overheating[id]);
+    responses.power_on[id] = res;
+    req.on("end", () => delete responses.power_on[id]);
   });
-  Router.get("/bulb/readallproperties", (req, res) => {
+  Router.get("/bulb/readallproperties", powerMiddleware, (req, res) => {
     res.json(bulb);
   });
   return Router;
 };
 
+function powerMiddleware(req, res, next) {
+  if (power) {
+    next();
+  } else {
+    res.status(500).json({ message: "OperationError: The power is off" });
+  }
+}
 const uuid_generator = () => Date.now() + Math.random();
-const overheating = () => {
-  const emitEvent = () => {
-    Object.keys(responses.overheating).forEach((key) => {
-      responses.overheating[key].send();
-    });
-  };
-  timeoutID = setTimeout(emitEvent, 4 * 3600000);
-};
