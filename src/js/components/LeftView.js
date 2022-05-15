@@ -2,12 +2,12 @@
 import $ from "jquery";
 import JSONFormatter from "json-formatter-js";
 let observeIcon = (propertyName) =>
-  `<i id ="observeIcon--${propertyName}" class="bi-eye-fill leftView--observeIcon"> </i>`;
+  `<i id ="observeIcon--${propertyName}" class="bi-eye-fill leftView--observeIcon" data-bs-toggle="tooltip" data-bs-placement="top" title="Observable Property"> </i>`;
 let observeIconActive = (propertyName) =>
-  `<i id ="observeIcon--${propertyName}" class="bi-eye-fill leftView--observeIcon--active"> </i>`;
+  `<i id ="observeIcon--${propertyName}" class="bi-eye-fill leftView--observeIcon--active" data-bs-toggle="tooltip" data-bs-placement="top" title="The property is being observed"> </i>`;
 let editIcon = (propertyName) =>
-  `<i id ="editIcon--${propertyName}" class="leftView--editIcon bi-pencil-fill"> </i>`;
-let readableIcon = `<i class="bi-book-fill readableIcon"> </i>`;
+  `<i id ="editIcon--${propertyName}" class="leftView--editIcon bi-pencil-fill" data-bs-toggle="tooltip" data-bs-placement="top" title="Writable Property"> </i>`;
+let readableIcon = `<i class="bi-book-fill readableIcon" data-bs-toggle="tooltip" data-bs-placement="top" title="Readable Property"> </i>`;
 const updateMiddleView = new Event("updateMiddleView");
 class LeftView {
   #tc;

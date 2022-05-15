@@ -3,10 +3,11 @@ import $ from "jquery";
 import JSONFormatter from "json-formatter-js";
 import UriVariables from "./UriVariables";
 import DescriptionElement from "./DescriptionElement";
-let observeIcon = `<i id="middleView--observeIcon" class="bi-eye-fill"> </i>`;
-let observeIconActive = `<i id="middleView--observeIcon" class="bi-eye-fill middleView--observeIcon--active"> </i>`;
-let refreshIcon = `<span id="middleView--refreshIcon"class="bi-arrow-clockwise"/>`;
-let editIcon = '<i id="middleView--editIcon" class="bi-pencil-fill"> </i>';
+let observeIcon = `<i id="middleView--observeIcon" data-bs-toggle="tooltip" data-bs-placement="top" title="Click to observe property" class="bi-eye-fill"> </i>`;
+let observeIconActive = `<i id="middleView--observeIcon" data-bs-toggle="tooltip" data-bs-placement="top" title="Click to unobserve property" class="bi-eye-fill middleView--observeIcon--active"> </i>`;
+let refreshIcon = `<span id="middleView--refreshIcon" class="bi-arrow-clockwise" data-bs-toggle="tooltip" data-bs-placement="top" title="Click to reread property"/>`;
+let editIcon =
+  '<i id="middleView--editIcon" data-bs-toggle="tooltip" data-bs-placement="top" title="Click to write property" class="bi-pencil-fill"> </i>';
 let descriptionString = (id, description) => {
   const element = $.parseHTML(
     `
