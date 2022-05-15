@@ -13,7 +13,7 @@ class Settings {
     if (defaultSettings === null) {
       defaultSettings = {
         notificationSound: true,
-        logs: "onlyNotifications",
+        logs: "all",
         theme: "default",
         arraySeparator: ",",
       };
@@ -40,22 +40,18 @@ class Settings {
             defaultSettings.logs === "all" ? "selected" : ""
           }  value="all">All</option>
         </select>
-        <label class="form-select-label" for="settings-theme">Theme</label>
-        <select id="settings-theme" class="form-select" aria-label="">
-          <option 
-            ${defaultSettings.theme === "default" ? "selected" : ""} 
-            value="default">Light
-          </option>
-          <option 
-          ${
-            defaultSettings.theme === "dark" ? "selected" : ""
-          }  value="dark">Dark</option>
-        </select>
   </div>`;
-    /*   <label class="form-text-label" for="settings-arraySeparator">Array Separator</label>
-  <input type="text" id="settings-arraySeparator" value="${
-    defaultSettings.arraySeparator
-  }" class=""/> */
+    /*   <label class="form-select-label" for="settings-theme">Theme</label>
+  <select id="settings-theme" class="form-select" aria-label="">
+    <option 
+      ${defaultSettings.theme === "default" ? "selected" : ""} 
+      value="default">Light
+    </option>
+    <option 
+    ${
+      defaultSettings.theme === "dark" ? "selected" : ""
+    }  value="dark">Dark</option>
+  </select> */
   }
   appendSettingsForm() {
     $("#settingsForm").remove();
@@ -90,7 +86,6 @@ class Settings {
     document
       .getElementsByTagName("body")[0]
       .setAttribute("data-theme", settings.theme);
-    // $("body")[0].attr("data-theme", "dark");
   }
   isNotificationSoundOn() {
     return JSON.parse(localStorage.getItem("settings")).notificationSound;
