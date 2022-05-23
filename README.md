@@ -26,8 +26,7 @@ Downlaod the zipped folder, then unzip it and after that open the index.html fil
 - Accessible on the browser by both desktop and smartphone with a responsive view.
 
 ## Documentation
-
-<a href="https://wintechis.github.io/TD-Browser/" download>Click to Go</a>
+<a href="https://wintechis.github.io/TD-Browser/index.html" download>Click to Go</a>
 
 ## Tutorial
 
