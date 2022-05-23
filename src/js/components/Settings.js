@@ -1,6 +1,13 @@
 import sound from "../../../assets/sound.mp3";
 
 import $ from "jquery";
+/**
+ * Class to create an object that manages the app settings.
+ * @type {object}
+ * @constructor
+ * @public
+ * @property {object} LogsViewer - Holds an instance of the RightView class.
+ */
 class Settings {
   get htmlElement() {
     return this.#htmlElement();
@@ -8,6 +15,11 @@ class Settings {
   get getArraySeparator() {
     return JSON.parse(localStorage.getItem("settings")).arraySeparator;
   }
+  /**
+   * Generates an HTML form for the settings.
+   * @type {Function}
+   * @returns {object} - returns an HTML
+   */
   generateSettingsForm() {
     let defaultSettings = JSON.parse(localStorage.getItem("settings"));
     if (defaultSettings === null) {
@@ -41,22 +53,21 @@ class Settings {
           }  value="all">All</option>
         </select>
   </div>`;
-    /*   <label class="form-select-label" for="settings-theme">Theme</label>
-  <select id="settings-theme" class="form-select" aria-label="">
-    <option 
-      ${defaultSettings.theme === "default" ? "selected" : ""} 
-      value="default">Light
-    </option>
-    <option 
-    ${
-      defaultSettings.theme === "dark" ? "selected" : ""
-    }  value="dark">Dark</option>
-  </select> */
   }
+  /**
+   * Appends the HTML settings form.
+   * @type {Function}
+   * @returns {void}
+   */
   appendSettingsForm() {
     $("#settingsForm").remove();
     $("#settings-form-container").append(this.generateSettingsForm());
   }
+  /**
+   * Saves new settings to the local storage.
+   * @type {Function}
+   * @returns {void}
+   */
   saveSettings() {
     const settings = {
       notificationSound: $("#notificationSound").is(":checked"),
@@ -68,6 +79,11 @@ class Settings {
     this.appendSettingsForm();
     this.applySettings();
   }
+  /**
+   * Applying settings on the app.
+   * @type {Function}
+   * @returns {void}
+   */
   applySettings() {
     let defaultSettings = {
       notificationSound: true,
@@ -87,13 +103,28 @@ class Settings {
       .getElementsByTagName("body")[0]
       .setAttribute("data-theme", settings.theme);
   }
+  /**
+   * Returns true if the sound is on and returns false if the sound is off.
+   * @type {Function}
+   * @returns {boolean}
+   */
   isNotificationSoundOn() {
     return JSON.parse(localStorage.getItem("settings")).notificationSound;
   }
+  /**
+   * Play sound.
+   * @type {Function}
+   * @returns {void}
+   */
   playSound() {
     this.isNotificationSoundOn() &&
       document.getElementById("notificationAudio").play();
   }
+  /**
+   * Returns HTML settings as a string.
+   * @type {Function}
+   * @returns {string}
+   */
   #htmlElement() {
     this.applySettings();
     return `
