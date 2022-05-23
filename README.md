@@ -2,16 +2,15 @@
 
 ## A Beginner-friendly Web-Client for the Web of Things
 
-TD-Browser is a cloud-enabled, mobile-ready, offline-storage compatible,
-AngularJS-powered HTML5 Markdown editor.
+I introduce the TD-Browser which enables visual interactions with Web Things by generating user interface elements from Thing Descriptions. The target group are beginners who did not yet understand the concept of the Web of Things.
 
-## Live URL
+## Live Demo
 
 <a href="http://www.paul.ti.rw.fau.de/~ro79vave/TD-Browser/" download>Click to Go</a>
 
 ## Installation
 
-Downlaod the zipped folder, then unzip it and after that open the index.html file.
+Download the zipped folder, then unzip it and after that open the index.html file.
 <a href="https://github.com/wintechis/TD-Browser/archive/refs/heads/deploy.zip" download>Click to Download</a>
 
 ## Features
@@ -26,9 +25,7 @@ Downlaod the zipped folder, then unzip it and after that open the index.html fil
 - Accessible on the browser by both desktop and smartphone with a responsive view.
 
 ## Documentation
-
 <a href="https://wintechis.github.io/TD-Browser/index.html" download>Click to Go</a>
 
 ## Tutorial
-
-<a href="https://wintechis.github.io/TD-Browser/tutorial-Tutorial.html" download>Click to Go</a>
+<a href="https://wintechis.github.io/TD-Browser/tutorial-Tutorials.html" download>Click to Go</a>
