@@ -12,6 +12,7 @@
   "opts": {
     "recurse": true,
     "destination": "./docs/",
-    "readme": "./README.md"
+    "readme": "./README.md",
+    "tutorials": "./tutorial"
   }
 }
