@@ -1,5 +1,5 @@
 {
-  "name": "td-form",
+  "name": "TD-Browser",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -12,15 +12,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/OsamaHanoun/td-form.git"
+    "url": "git+https://github.com/OsamaHanoun/TD-Browser.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/OsamaHanoun/td-form/issues"
+    "url": "https://github.com/OsamaHanoun/TD-Browser/issues"
   },
-  "homepage": "https://github.com/OsamaHanoun/td-form#readme",
+  "homepage": "https://github.com/OsamaHanoun/TD-Browser#readme",
   "dependencies": {
     "@node-wot/binding-http": "^0.7.8",
     "@node-wot/browser-bundle": "^0.7.8",
