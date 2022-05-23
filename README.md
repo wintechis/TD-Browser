@@ -29,5 +29,4 @@ Downlaod the zipped folder, then unzip it and after that open the index.html fil
 <a href="https://wintechis.github.io/TD-Browser/index.html" download>Click to Go</a>
 
 ## Tutorial
-
-<a href="https://wintechis.github.io/TD-Browser/tutorial-Tutorial.html" download>Click to Go</a>
+<a href="https://wintechis.github.io/TD-Browser/tutorial-Tutorials.html" download>Click to Go</a>
