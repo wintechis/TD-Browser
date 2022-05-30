@@ -27,15 +27,15 @@ TD-Browser enables visual interactions with Web Things by generating user interf
 
 <a href="http://www.paul.ti.rw.fau.de/~ro79vave/TD-Browser/" download>Click to Go</a>
 
-## Downlaod
+## Download TD-Browser
 
 Download the zipped folder, then unzip it and after that open the index.html file.
 <a href="https://github.com/wintechis/TD-Browser/archive/refs/heads/deploy.zip" download>Click to Download</a>
 
-## Virtual Light Bulb Instaliation 
+## Virtual Light Bulb installation 
 
  - You need to have NodeJS and NPM installed on your device.
- - Download and then unzip the following folder which containes the virtual light bulb files. <a href="https://downgit.github.io/#/home?url=https://github.com/wintechis/TD-Browser/tree/main/virtual_devices">Click to Download</a>
+ - Download and then unzip the following folder which contains the virtual light bulb files. <a href="https://downgit.github.io/#/home?url=https://github.com/wintechis/TD-Browser/tree/main/virtual_devices">Click to Download</a>
  - Navigate to the unzipped folder location and then run the following commands in your command line: 
  ``` npm i
      node index.html
