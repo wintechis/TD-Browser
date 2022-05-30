@@ -1,8 +1,8 @@
 # TD-Browser
 
-## A Beginner-friendly Web-Client for the Web of Things
+<strong>A Beginner-friendly Web-Client for the Web of Things</strong>
 
-I introduce the TD-Browser which enables visual interactions with Web Things by generating user interface elements from Thing Descriptions. The target group are beginners who did not yet understand the concept of the Web of Things.
+TD-Browser enables visual interactions with Web Things by generating user interface elements from Thing Descriptions.
 
 ## Live Demo
 
