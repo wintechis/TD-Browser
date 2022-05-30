@@ -13,6 +13,6 @@
     "recurse": true,
     "destination": "./docs/",
     "readme": "./README.md",
-    "tutorials": "./tutorial"
+    "tutorials": "./Tutorial"
   }
 }
