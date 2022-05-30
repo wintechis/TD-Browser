@@ -4,16 +4,7 @@
 
 TD-Browser enables visual interactions with Web Things by generating user interface elements from Thing Descriptions.
 
-<a href="https://imgur.com/gZiPsIY"><img src="https://i.imgur.com/gZiPsIY.gif" title="source: imgur.com" /></a>
-
-## Live Demo
-
-<a href="http://www.paul.ti.rw.fau.de/~ro79vave/TD-Browser/" download>Click to Go</a>
-
-## Downlaod
-
-Download the zipped folder, then unzip it and after that open the index.html file.
-<a href="https://github.com/wintechis/TD-Browser/archive/refs/heads/deploy.zip" download>Click to Download</a>
+<img src="https://i.imgur.com/gZiPsIY.gif" title="Teaser For TD-Browser" />
 
 ## Features
 
@@ -31,3 +22,14 @@ Download the zipped folder, then unzip it and after that open the index.html fil
 
 ## Tutorial
 <a href="https://wintechis.github.io/TD-Browser/tutorial-Tutorials.html" download>Click to Go</a>
+
+## Live Demo
+
+<a href="http://www.paul.ti.rw.fau.de/~ro79vave/TD-Browser/" download>Click to Go</a>
+
+## Downlaod
+
+Download the zipped folder, then unzip it and after that open the index.html file.
+<a href="https://github.com/wintechis/TD-Browser/archive/refs/heads/deploy.zip" download>Click to Download</a>
+
+
