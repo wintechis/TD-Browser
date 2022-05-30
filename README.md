@@ -37,7 +37,8 @@ Download the zipped folder, then unzip it and after that open the index.html fil
  - You need to have NodeJS and NPM installed on your device.
  - Download and then unzip the following folder which contains the virtual light bulb files. <a href="https://downgit.github.io/#/home?url=https://github.com/wintechis/TD-Browser/tree/main/virtual_devices">Click to Download</a>
  - Navigate to the unzipped folder location and then run the following commands in your command line: 
- ``` npm i
+ ``` 
+     npm i
      node index.html
  ```
  - Now on your browser use the following link to see the virtual light bulb: http://localhost:3001/client/bulb
