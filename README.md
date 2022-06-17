@@ -4,6 +4,8 @@
 
 TD-Browser enables visual interactions with Web Things by generating user interface elements from Thing Descriptions.
 
+Watch an [overview of TD-Browser](https://youtu.be/xmwnynPucK8)
+
 <img src="https://i.imgur.com/gZiPsIY.gif" title="Teaser For TD-Browser" />
 
 ## Features
